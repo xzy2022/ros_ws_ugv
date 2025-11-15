@@ -1,0 +1,27 @@
+# Catkin build artifacts
+build/
+devel/
+install/
+log/
+.catkin_tools/
+.rosinstall
+src/CMakeLists.txt
+
+# Generated or temporary files
+**/*.swp
+**/*.swo
+*.pyc
+__pycache__/
+**/ros_ws/.ros
+*.log
+*.bag
+*.bag.active
+
+# IDE / editor configs
+.vscode/
+.idea/
+*.code-workspace
+
+# System files
+.DS_Store
+Thumbs.db

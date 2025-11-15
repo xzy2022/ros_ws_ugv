@@ -53,9 +53,10 @@
     </collision>
 
     <visual>
-      <origin xyz="0 0 ${base_collision_height}" rpy="0 0 0"/>  
+      <origin xyz="0.05 0 ${base_collision_height}" rpy="0 0 ${PI/2}"/>  
       <geometry>
-        <box size="${base_length} ${base_width} ${base_height}"/>
+        <mesh filename="package://car_model/meshes/vehicle_body.dae"/>
+        <!-- <box size="${base_length} ${base_width} ${base_height}"/> -->
       </geometry>
     </visual>
   </link>
@@ -98,9 +99,10 @@
     </collision>
 
     <visual>
-      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 -${PI/2}"/>
       <geometry>
-        <cylinder length="${rear_tyre_length}" radius="${rear_tyre_r}"/>
+        <mesh filename="package://car_model/meshes/wheel.dae"/>
+        <!-- <cylinder length="${rear_tyre_length}" radius="${rear_tyre_r}"/> -->
       </geometry>
     </visual>
 
@@ -134,8 +136,9 @@
     </collision>
 
     <visual>
-      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 ${PI/2}"/>
       <geometry>
+        <mesh filename="package://car_model/meshes/wheel.dae"/>
         <cylinder length="${rear_tyre_length}" radius="${rear_tyre_r}"/>
       </geometry>
     </visual>
@@ -199,8 +202,9 @@
     </collision>
 
     <visual>
-      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 -${PI/2}"/>
       <geometry>
+        <mesh filename="package://car_model/meshes/wheel.dae"/>
         <cylinder length="${front_tyre_length}" radius="${front_tyre_r}"/>
       </geometry>  
     </visual>
@@ -265,9 +269,10 @@
     </collision>
 
     <visual>
-      <origin xyz="0 0 0" rpy="${PI/2} 0 0"/>
+      <origin xyz="0 0 0" rpy="0 0 ${PI/2}"/>
       <geometry>
-        <cylinder length="${front_tyre_length}" radius="${front_tyre_r}"/>
+        <mesh filename="package://car_model/meshes/wheel.dae"/>
+        <!-- <cylinder length="${front_tyre_length}" radius="${front_tyre_r}"/> -->
       </geometry>  
     </visual>
 

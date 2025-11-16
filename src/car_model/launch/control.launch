@@ -13,4 +13,13 @@
         <remap from="/joint_states" to="/$(arg robot_name)/joint_states" />
     </node>
 
+
+    <!-- 速度控制小车运动 -->
+    <node name="cmdvel2gazebo" pkg="car_model" type="cmdvel2gazebo.py" respawn="true" output="screen"/>
+
+    <!--  获得真实位姿和速度 /smart/center_pose /smart/rear_pose /smart/velocity-->
+    <node name="vehicle_pose_and_velocity_updater" pkg="car_model" type="vehicle_pose_and_velocity_updater.py" respawn="true" output="screen"/>
+
+    <!-- <node name="transform_publisher" pkg="car_model" type="transform_publisher.py" respawn="true" output="screen"/> -->
+
 </launch>

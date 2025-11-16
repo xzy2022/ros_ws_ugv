@@ -5,9 +5,9 @@ smart:
   # Publish all joint states -----------------------------------
 
   # 关节控制器，从Gazebo向ROS发布机器人关节的状态
-  # joint_state_controller:
-  #   type: joint_state_controller/JointStateController
-  #   publish_rate: 50  
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50  
   
   # 后轮的速度控制器
   rear_right_velocity_controller:

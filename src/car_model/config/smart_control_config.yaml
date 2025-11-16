@@ -1,0 +1,31 @@
+smart:
+# 一些我们想要运行在Gazebo内的ROS代码片段，我们统称为控制器。
+# 这些代码最初被加载到ROS参数空间中。
+# controls the rear two tires based on individual motors
+  # Publish all joint states -----------------------------------
+
+  # 关节控制器，从Gazebo向ROS发布机器人关节的状态
+  # joint_state_controller:
+  #   type: joint_state_controller/JointStateController
+  #   publish_rate: 50  
+  
+  # 后轮的速度控制器
+  rear_right_velocity_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: rear_right_wheel_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+  rear_left_velocity_controller:
+    type: velocity_controllers/JointVelocityController
+    joint: rear_left_wheel_joint
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  # 前轮的位置控制器
+  front_right_steering_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: front_right_steering_joint
+    pid: {p: 40000.0, i: 200.0, d: 1.0}    
+  front_left_steering_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: front_left_steering_joint
+    pid: {p: 40000.0, i: 200.0, d: 1.0}
+

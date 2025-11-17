@@ -22,13 +22,7 @@
     source ~/catkin_ws/devel/setup.bash
     roslaunch car_model spawn_car.launch
     ```
-3.  **打开第三个终端，启动定位更新节点（第9课内容）：**
-      * *确保你已经完成了第9课的 `vehicle_pose_and_velocity_updater.py` 脚本配置。*
-    <!-- end list -->
-    ```bash
-    source ~/catkin_ws/devel/setup.bash
-    rosrun car_model vehicle_pose_and_velocity_updater.py
-    ```
+
 
 ### 2\. 启动 Rviz 可视化工具
 
@@ -86,10 +80,32 @@
 ### 4\. 验证可视化效果
 
 1.  **使用 `rostopic pub` 驱动小车（第8课内容）：**
-      * **前进并转弯：** 在另一个终端中发布 `/cmd_vel` 指令：
-        ```bash
-        rostopic pub -r 10 /cmd_vel geometry_msgs/Twist "linear: {x: 1.0, y: 0.0, z: 0.0}" "angular: {x: 0.0, y: 0.0, z: 0.2}"
-        ```
+前进（直行）：
+
+    ```bash
+    rostopic pub -r 10 /smart/cmd_vel geometry_msgs/Twist "linear:
+      x: 1.0  # 前进速度 (1.0 m/s 或 1.0 rad/s)
+      y: 0.0
+      z: 0.0
+    angular:
+      x: 0.0
+      y: 0.0
+      z: 0.0" 
+    ```
+
+左转弯（带阿克曼转向）：
+
+```bash
+
+rostopic pub -r 10 /cmd_vel geometry_msgs/Twist "linear:
+    x: 1.0
+    y: 0.0
+    z: 0.0
+angular:
+    x: 0.0
+    y: 0.0
+    z: 0.5" # 逆时针旋转，实现左转
+```
 2.  **观察 Rviz 变化：**
       * Rviz 中的 **`RobotModel`** 应该沿着轨迹移动。
       * **`Pose`** 箭头应实时更新位置和方向。

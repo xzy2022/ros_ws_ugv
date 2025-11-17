@@ -77,7 +77,7 @@
     </link>
 
 
-    <!--Rear Right Wheel-->
+    <!--base_link - rear_right_wheel-->
     <joint name="rear_right_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="rear_right_wheel_link"/>
@@ -111,7 +111,7 @@
         </inertial>
     </link>
 
-    <!--Rear Left Wheel-->
+    <!--base_link - rear_left_wheel-->
     <joint name="rear_left_wheel_joint" type="continuous">
         <parent link="base_link"/>
         <child link="rear_left_wheel_link"/>
@@ -145,7 +145,7 @@
         </inertial>
     </link>
 
-    <!--Front Right Steering-->
+    <!--base_link - front_right_steering - front_right_wheel_link-->
     <joint name="front_right_steering_joint" type="revolute">
         <parent link="base_link"/>
         <child link="front_right_steering_link"/>
@@ -342,29 +342,7 @@
             <mechanicalReduction>1</mechanicalReduction>
         </actuator>
     </transmission> -->
-    <!--  -->
 
-    <transmission name="tran5">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="front_right_wheel_joint">
-            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="motor3">
-            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-            <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
-
-    <transmission name="tran6">
-        <type>transmission_interface/SimpleTransmission</type>
-        <joint name="front_left_wheel_joint">
-            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-        </joint>
-        <actuator name="motor4">
-            <hardwareInterface>hardware_interface/VelocityJointInterface</hardwareInterface>
-            <mechanicalReduction>1</mechanicalReduction>
-        </actuator>
-    </transmission>
 
     <!-- Friction Parametres -->
 

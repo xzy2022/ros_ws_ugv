@@ -20,6 +20,6 @@
     <!--  获得真实位姿和速度 /smart/center_pose /smart/rear_pose /smart/velocity-->
     <node name="vehicle_pose_and_velocity_updater" pkg="car_model" type="vehicle_pose_and_velocity_updater.py" respawn="true" output="screen"/>
 
-    <!-- <node name="transform_publisher" pkg="car_model" type="transform_publisher.py" respawn="true" output="screen"/> -->
+    <node name="transform_publisher" pkg="car_model" type="transform_publisher.py" respawn="true" output="screen"/>
 
 </launch>

@@ -288,7 +288,8 @@ class ExperimentRunner:
         if self.run_plots:
             self._plot_paths(target_xy, actual_xy)
             self._plot_series(stamp, cte, "Cross-track error (m)", "cte.png")
-            self._plot_series(stamp, heading_err, "Heading error (rad)", "heading_error.png")
+            heading_err_deg = np.degrees(heading_err)
+            self._plot_series(stamp, heading_err_deg, "Heading error (deg)", "heading_error.png")
             self._plot_speed(stamp, speed, target_speed)
             rospy.logwarn(f"Plots written to {self.run_dir}")
 

@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<launch>
+    <node name="stanley_controller" pkg="stanley_controller" type="stanley_controller.py" respawn="true" output="screen"/>
+</launch>

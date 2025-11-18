@@ -1,0 +1,261 @@
+#!/usr/bin/env python3
+
+import os
+import math
+import time
+import subprocess
+from datetime import datetime
+from typing import Optional
+
+import rospy
+import tf
+import numpy as np
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from geometry_msgs.msg import PoseStamped, TwistStamped
+from styx_msgs.msg import Lane
+
+
+class ExperimentRunner:
+    def __init__(self):
+        rospy.init_node("experiment_runner", log_level=rospy.DEBUG)
+
+        self.algorithm = rospy.get_param("~algorithm", "stanley")  # stanley or pure_persuit
+        self.duration = rospy.get_param("~duration", 60.0)
+        results_root = rospy.get_param("~results_root", "")
+
+        # paths
+        base_dir = results_root if results_root else os.path.join(
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results"
+        )
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.run_dir = os.path.join(base_dir, timestamp)
+        os.makedirs(self.run_dir, exist_ok=True)
+        self.data_path = os.path.join(self.run_dir, "data.txt")
+        self.summary_path = os.path.join(self.run_dir, "summary.txt")
+        self.index_path = os.path.join(base_dir, "summary.txt")
+
+        # state
+        self.pose: Optional[PoseStamped] = None
+        self.velocity: Optional[TwistStamped] = None
+        self.waypoints: Optional[Lane] = None
+        self.target_speed: float = 0.0
+
+        rospy.Subscriber("/smart/rear_pose", PoseStamped, self.pose_cb, queue_size=1)
+        rospy.Subscriber("/smart/velocity", TwistStamped, self.vel_cb, queue_size=1)
+        rospy.Subscriber("/final_waypoints", Lane, self.waypoints_cb, queue_size=1)
+
+        self.controller_process: Optional[subprocess.Popen] = None
+
+        self._start_controller()
+        self._run_experiment()
+        self._stop_controller()
+        self._analyze_and_plot()
+
+    def _start_controller(self):
+        launch_map = {
+            "stanley": ["roslaunch", "stanley_controller", "stanley_controller.launch"],
+            "pure_persuit": ["roslaunch", "pure_persuit", "pure_persuit.launch"],
+        }
+        cmd = launch_map.get(self.algorithm)
+        if cmd:
+            rospy.logwarn(f"Starting controller: {self.algorithm}")
+            self.controller_process = subprocess.Popen(cmd)
+        else:
+            rospy.logwarn(f"No controller started, unknown algorithm: {self.algorithm}")
+
+    def _stop_controller(self):
+        if self.controller_process and self.controller_process.poll() is None:
+            rospy.logwarn("Stopping controller process")
+            self.controller_process.terminate()
+            try:
+                self.controller_process.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                rospy.logwarn("Controller did not exit, killing")
+                self.controller_process.kill()
+
+    def pose_cb(self, msg: PoseStamped):
+        self.pose = msg
+
+    def vel_cb(self, msg: TwistStamped):
+        self.velocity = msg
+
+    def waypoints_cb(self, msg: Lane):
+        self.waypoints = msg
+        if msg.waypoints:
+            self.target_speed = msg.waypoints[0].twist.twist.linear.x
+
+    def _run_experiment(self):
+        rospy.logwarn(f"Experiment running for {self.duration:.1f} seconds using {self.algorithm}")
+        rate = rospy.Rate(20)
+        start = rospy.Time.now().to_sec()
+        with open(self.data_path, "w") as f:
+            f.write("# stamp target_x target_y actual_x actual_y heading speed target_speed cte heading_err\n")
+            while not rospy.is_shutdown():
+                now = rospy.Time.now().to_sec()
+                if (now - start) > self.duration:
+                    break
+                if self.pose and self.velocity and self.waypoints and self.waypoints.waypoints:
+                    entry = self._collect_sample()
+                    if entry:
+                        f.write(" ".join(f"{v:.6f}" for v in entry) + "\n")
+                rate.sleep()
+        rospy.logwarn("Experiment data collection finished")
+
+    def _collect_sample(self):
+        px = self.pose.pose.position.x
+        py = self.pose.pose.position.y
+        quat = (
+            self.pose.pose.orientation.x,
+            self.pose.pose.orientation.y,
+            self.pose.pose.orientation.z,
+            self.pose.pose.orientation.w,
+        )
+        _, _, yaw = tf.transformations.euler_from_quaternion(quat)
+
+        nearest_idx, _ = self._nearest_waypoint(px, py, self.waypoints.waypoints)
+        target_wp = self.waypoints.waypoints[nearest_idx]
+        target_x = target_wp.pose.pose.position.x
+        target_y = target_wp.pose.pose.position.y
+        path_yaw = self._path_heading(nearest_idx, self.waypoints.waypoints)
+        heading_err = self._normalize_angle(path_yaw - yaw)
+        cte = self._cross_track_error(px, py, target_x, target_y, path_yaw)
+
+        stamp = self.pose.header.stamp.to_sec() if self.pose.header.stamp else rospy.Time.now().to_sec()
+        speed = self.velocity.twist.linear.x
+        target_speed = target_wp.twist.twist.linear.x
+        return [stamp, target_x, target_y, px, py, yaw, speed, target_speed, cte, heading_err]
+
+    @staticmethod
+    def _normalize_angle(angle: float) -> float:
+        while angle > math.pi:
+            angle -= 2.0 * math.pi
+        while angle < -math.pi:
+            angle += 2.0 * math.pi
+        return angle
+
+    @staticmethod
+    def _cross_track_error(px, py, tx, ty, path_yaw):
+        dx = px - tx
+        dy = py - ty
+        return -math.sin(path_yaw) * dx + math.cos(path_yaw) * dy
+
+    @staticmethod
+    def _path_heading(idx, waypoints):
+        if idx >= len(waypoints) - 1:
+            ref_prev = idx - 1 if idx > 0 else idx
+            ref_next = idx
+        else:
+            ref_prev = idx
+            ref_next = idx + 1
+        prev_wp = waypoints[ref_prev].pose.pose.position
+        next_wp = waypoints[ref_next].pose.pose.position
+        dx = next_wp.x - prev_wp.x
+        dy = next_wp.y - prev_wp.y
+        if abs(dx) < 1e-6 and abs(dy) < 1e-6:
+            return 0.0
+        return math.atan2(dy, dx)
+
+    @staticmethod
+    def _nearest_waypoint(x, y, waypoints):
+        closest_idx = 0
+        closest_dist = float("inf")
+        for i, wp in enumerate(waypoints):
+            wx = wp.pose.pose.position.x
+            wy = wp.pose.pose.position.y
+            dist = math.hypot(wx - x, wy - y)
+            if dist < closest_dist:
+                closest_dist = dist
+                closest_idx = i
+        return closest_idx, closest_dist
+
+    def _analyze_and_plot(self):
+        data = np.loadtxt(self.data_path, comments="#")
+        if data.size == 0:
+            rospy.logwarn("No data logged, skipping analysis")
+            return
+        stamp = data[:, 0]
+        target_xy = data[:, 1:3]
+        actual_xy = data[:, 3:5]
+        heading = data[:, 5]
+        speed = data[:, 6]
+        target_speed = data[:, 7]
+        cte = data[:, 8]
+        heading_err = data[:, 9]
+
+        rms_cte = float(np.sqrt(np.mean(cte ** 2)))
+        mean_abs_cte = float(np.mean(np.abs(cte)))
+        rms_heading = float(np.sqrt(np.mean(heading_err ** 2)))
+        speed_rmse = float(np.sqrt(np.mean((speed - target_speed) ** 2)))
+        total_path = float(np.sum(np.linalg.norm(np.diff(actual_xy, axis=0), axis=1)))
+        goal_err = float(np.linalg.norm(actual_xy[-1] - target_xy[-1]))
+
+        lines = [
+            f"algorithm: {self.algorithm}",
+            f"samples: {len(data)}",
+            f"duration: {stamp[-1] - stamp[0]:.2f}s",
+            f"rms_cte: {rms_cte:.4f}",
+            f"mean_abs_cte: {mean_abs_cte:.4f}",
+            f"rms_heading_error: {rms_heading:.4f}",
+            f"speed_rmse: {speed_rmse:.4f}",
+            f"actual_path_length: {total_path:.2f} m",
+            f"goal_position_error: {goal_err:.4f} m",
+        ]
+        with open(self.summary_path, "w") as f:
+            f.write("\n".join(lines))
+        with open(self.index_path, "a") as f:
+            f.write(f"{datetime.now().isoformat()} {self.algorithm} {self.summary_path}\n")
+
+        self._plot_paths(target_xy, actual_xy)
+        self._plot_series(stamp, cte, "Cross-track error (m)", "cte.png")
+        self._plot_series(stamp, heading_err, "Heading error (rad)", "heading_error.png")
+        self._plot_speed(stamp, speed, target_speed)
+
+        rospy.logwarn(f"Analysis complete, results stored in {self.run_dir}")
+
+    def _plot_paths(self, target_xy, actual_xy):
+        plt.figure()
+        plt.plot(target_xy[:, 0], target_xy[:, 1], label="target path", linestyle="--")
+        plt.plot(actual_xy[:, 0], actual_xy[:, 1], label="actual path")
+        plt.axis("equal")
+        plt.legend()
+        plt.xlabel("x (m)")
+        plt.ylabel("y (m)")
+        plt.title("Path tracking")
+        plt.grid(True)
+        plt.tight_layout()
+        path = os.path.join(self.run_dir, "path.png")
+        plt.savefig(path)
+        plt.close()
+
+    def _plot_series(self, stamp, series, ylabel, filename):
+        plt.figure()
+        plt.plot(stamp, series)
+        plt.xlabel("time (s)")
+        plt.ylabel(ylabel)
+        plt.grid(True)
+        plt.tight_layout()
+        path = os.path.join(self.run_dir, filename)
+        plt.savefig(path)
+        plt.close()
+
+    def _plot_speed(self, stamp, speed, target_speed):
+        plt.figure()
+        plt.plot(stamp, speed, label="actual")
+        plt.plot(stamp, target_speed, label="target", linestyle="--")
+        plt.xlabel("time (s)")
+        plt.ylabel("speed (m/s)")
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        path = os.path.join(self.run_dir, "speed.png")
+        plt.savefig(path)
+        plt.close()
+
+
+if __name__ == "__main__":
+    try:
+        ExperimentRunner()
+    except rospy.ROSInterruptException:
+        pass

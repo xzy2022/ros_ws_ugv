@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<launch>
+    <arg name="algorithm" default="stanley" />
+    <arg name="duration" default="60.0" />
+    <arg name="results_root" default="" />
+
+    <node name="experiment_runner"
+          pkg="control_experiments"
+          type="experiment_runner.py"
+          output="screen"
+          respawn="false">
+        <param name="algorithm" value="$(arg algorithm)" />
+        <param name="duration" value="$(arg duration)" />
+        <param name="results_root" value="$(arg results_root)" />
+    </node>
+</launch>

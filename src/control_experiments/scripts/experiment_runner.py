@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Optional
 
 import rospy
+import rosgraph
 import tf
 import numpy as np
 import matplotlib
@@ -23,6 +24,7 @@ class ExperimentRunner:
 
         self.algorithm = rospy.get_param("~algorithm", "stanley")  # stanley or pure_persuit
         self.duration = rospy.get_param("~duration", 60.0)
+        self.require_rviz = rospy.get_param("~require_rviz", False)
         results_root = rospy.get_param("~results_root", "")
 
         # paths
@@ -48,10 +50,13 @@ class ExperimentRunner:
 
         self.controller_process: Optional[subprocess.Popen] = None
 
-        self._start_controller()
-        self._run_experiment()
-        self._stop_controller()
-        self._analyze_and_plot()
+        if self._check_prerequisites():
+            self._start_controller()
+            self._run_experiment()
+            self._stop_controller()
+            self._analyze_and_plot()
+        else:
+            rospy.logerr("Prerequisite check failed, experiment not started")
 
     def _start_controller(self):
         launch_map = {
@@ -64,6 +69,8 @@ class ExperimentRunner:
             self.controller_process = subprocess.Popen(cmd)
         else:
             rospy.logwarn(f"No controller started, unknown algorithm: {self.algorithm}")
+            return
+        time.sleep(1.0)
 
     def _stop_controller(self):
         if self.controller_process and self.controller_process.poll() is None:
@@ -85,6 +92,50 @@ class ExperimentRunner:
         self.waypoints = msg
         if msg.waypoints:
             self.target_speed = msg.waypoints[0].twist.twist.linear.x
+
+    def _check_prerequisites(self) -> bool:
+        """
+        Check if gazebo, model, paths, and (optionally) rviz are available before the experiment.
+        """
+        ready = True
+
+        # topics snapshot
+        topics = rospy.get_published_topics()
+        topic_names = {t[0] for t in topics}
+
+        master = rosgraph.Master(rospy.get_name())
+        try:
+            state = master.getSystemState()
+            publishers = state[0]
+            nodes_with_publishers = {n for _, nodelist in publishers for n in nodelist}
+        except Exception as exc:  # pragma: no cover
+            rospy.logwarn(f"Failed to read ROS master state: {exc}")
+            nodes_with_publishers = set()
+
+        gazebo_ok = any(t.startswith("/gazebo/") for t in topic_names) or "/gazebo" in topic_names
+        rospy.logwarn(f"Gazebo running: {'YES' if gazebo_ok else 'NO'}")
+        ready = ready and gazebo_ok
+
+        model_ok = all(t in topic_names for t in ["/smart/rear_pose", "/smart/velocity"])
+        rospy.logwarn(f"Car model topics (/smart/rear_pose, /smart/velocity): {'YES' if model_ok else 'NO'}")
+        ready = ready and model_ok
+
+        global_path_ok = "/base_waypoints" in topic_names or "/lane" in topic_names
+        rospy.logwarn(f"Global path ready (/base_waypoints or /lane): {'YES' if global_path_ok else 'NO'}")
+        ready = ready and global_path_ok
+
+        local_path_ok = "/final_waypoints" in topic_names
+        rospy.logwarn(f"Local path ready (/final_waypoints): {'YES' if local_path_ok else 'NO'}")
+        ready = ready and local_path_ok
+
+        if self.require_rviz:
+            rviz_ok = any("rviz" in n for n in nodes_with_publishers)
+            rospy.logwarn(f"RViz running: {'YES' if rviz_ok else 'NO'} (require_rviz={self.require_rviz})")
+            ready = ready and rviz_ok
+        else:
+            rospy.logwarn("RViz check skipped (require_rviz=false)")
+
+        return ready
 
     def _run_experiment(self):
         rospy.logwarn(f"Experiment running for {self.duration:.1f} seconds using {self.algorithm}")

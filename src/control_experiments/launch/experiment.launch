@@ -3,6 +3,7 @@
     <arg name="algorithm" default="stanley" />
     <arg name="duration" default="60.0" />
     <arg name="results_root" default="" />
+    <arg name="require_rviz" default="false" />
 
     <node name="experiment_runner"
           pkg="control_experiments"
@@ -12,5 +13,6 @@
         <param name="algorithm" value="$(arg algorithm)" />
         <param name="duration" value="$(arg duration)" />
         <param name="results_root" value="$(arg results_root)" />
+        <param name="require_rviz" value="$(arg require_rviz)" />
     </node>
 </launch>

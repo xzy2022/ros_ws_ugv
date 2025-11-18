@@ -25,18 +25,32 @@ class ExperimentRunner:
         self.algorithm = rospy.get_param("~algorithm", "stanley")  # stanley or pure_persuit
         self.duration = rospy.get_param("~duration", 60.0)
         self.require_rviz = rospy.get_param("~require_rviz", False)
+        self.start_controller = rospy.get_param("~start_controller", True)
+        self.run_collection = rospy.get_param("~run_collection", True)
+        self.run_metrics = rospy.get_param("~run_metrics", True)
+        self.run_plots = rospy.get_param("~run_plots", True)
+        self.run_index = rospy.get_param("~run_index", True)
+        self.existing_data_path = rospy.get_param("~existing_data_path", "")
         results_root = rospy.get_param("~results_root", "")
 
         # paths
-        base_dir = results_root if results_root else os.path.join(
+        self.base_dir = results_root if results_root else os.path.join(
             os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "results"
         )
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.run_dir = os.path.join(base_dir, timestamp)
+        if self.run_collection:
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.run_dir = os.path.join(self.base_dir, timestamp)
+            os.makedirs(self.run_dir, exist_ok=True)
+            self.data_path = os.path.join(self.run_dir, "data.txt")
+        else:
+            if not self.existing_data_path:
+                rospy.logerr("run_collection is false but no existing_data_path provided")
+                raise SystemExit(1)
+            self.data_path = self.existing_data_path
+            self.run_dir = os.path.dirname(self.data_path)
         os.makedirs(self.run_dir, exist_ok=True)
-        self.data_path = os.path.join(self.run_dir, "data.txt")
         self.summary_path = os.path.join(self.run_dir, "summary.txt")
-        self.index_path = os.path.join(base_dir, "summary.txt")
+        self.index_path = os.path.join(self.base_dir, "summary.txt")
 
         # state
         self.pose: Optional[PoseStamped] = None
@@ -50,13 +64,18 @@ class ExperimentRunner:
 
         self.controller_process: Optional[subprocess.Popen] = None
 
-        if self._check_prerequisites():
-            self._start_controller()
-            self._run_experiment()
-            self._stop_controller()
+        if self.run_collection:
+            if self._check_prerequisites():
+                if self.start_controller:
+                    self._start_controller()
+                self._run_experiment()
+                if self.start_controller:
+                    self._stop_controller()
+            else:
+                rospy.logerr("Prerequisite check failed, experiment not started")
+                return
+        if self.run_metrics or self.run_plots or self.run_index:
             self._analyze_and_plot()
-        else:
-            rospy.logerr("Prerequisite check failed, experiment not started")
 
     def _start_controller(self):
         launch_map = {
@@ -98,44 +117,45 @@ class ExperimentRunner:
         Check if gazebo, model, paths, and (optionally) rviz are available before the experiment.
         """
         ready = True
+        attempts = 10
+        delay = 1.0
 
-        # topics snapshot
-        topics = rospy.get_published_topics()
-        topic_names = {t[0] for t in topics}
+        for attempt in range(attempts):
+            topics = rospy.get_published_topics()
+            topic_names = {t[0] for t in topics}
 
-        master = rosgraph.Master(rospy.get_name())
-        try:
-            state = master.getSystemState()
-            publishers = state[0]
-            nodes_with_publishers = {n for _, nodelist in publishers for n in nodelist}
-        except Exception as exc:  # pragma: no cover
-            rospy.logwarn(f"Failed to read ROS master state: {exc}")
-            nodes_with_publishers = set()
+            master = rosgraph.Master(rospy.get_name())
+            try:
+                state = master.getSystemState()
+                publishers = state[0]
+                nodes_with_publishers = {n for _, nodelist in publishers for n in nodelist}
+            except Exception as exc:  # pragma: no cover
+                rospy.logwarn(f"Failed to read ROS master state: {exc}")
+                nodes_with_publishers = set()
 
-        gazebo_ok = any(t.startswith("/gazebo/") for t in topic_names) or "/gazebo" in topic_names
-        rospy.logwarn(f"Gazebo running: {'YES' if gazebo_ok else 'NO'}")
-        ready = ready and gazebo_ok
+            gazebo_ok = any(t.startswith("/gazebo/") for t in topic_names) or "/gazebo" in topic_names
+            model_ok = all(t in topic_names for t in ["/smart/rear_pose", "/smart/velocity"])
+            global_path_ok = "/base_waypoints" in topic_names or "/lane" in topic_names
+            local_path_ok = "/final_waypoints" in topic_names
+            if self.require_rviz:
+                rviz_ok = any("rviz" in n for n in nodes_with_publishers)
+            else:
+                rviz_ok = True
 
-        model_ok = all(t in topic_names for t in ["/smart/rear_pose", "/smart/velocity"])
-        rospy.logwarn(f"Car model topics (/smart/rear_pose, /smart/velocity): {'YES' if model_ok else 'NO'}")
-        ready = ready and model_ok
+            rviz_status = "YES" if rviz_ok else ("SKIPPED" if not self.require_rviz else "NO")
+            rospy.logwarn(f"Prereq check {attempt+1}/{attempts}: "
+                          f"Gazebo={'YES' if gazebo_ok else 'NO'}, "
+                          f"CarModel={'YES' if model_ok else 'NO'}, "
+                          f"GlobalPath={'YES' if global_path_ok else 'NO'}, "
+                          f"LocalPath={'YES' if local_path_ok else 'NO'}, "
+                          f"RViz={rviz_status}")
 
-        global_path_ok = "/base_waypoints" in topic_names or "/lane" in topic_names
-        rospy.logwarn(f"Global path ready (/base_waypoints or /lane): {'YES' if global_path_ok else 'NO'}")
-        ready = ready and global_path_ok
+            if gazebo_ok and model_ok and global_path_ok and local_path_ok and rviz_ok:
+                return True
 
-        local_path_ok = "/final_waypoints" in topic_names
-        rospy.logwarn(f"Local path ready (/final_waypoints): {'YES' if local_path_ok else 'NO'}")
-        ready = ready and local_path_ok
+            rospy.sleep(delay)
 
-        if self.require_rviz:
-            rviz_ok = any("rviz" in n for n in nodes_with_publishers)
-            rospy.logwarn(f"RViz running: {'YES' if rviz_ok else 'NO'} (require_rviz={self.require_rviz})")
-            ready = ready and rviz_ok
-        else:
-            rospy.logwarn("RViz check skipped (require_rviz=false)")
-
-        return ready
+        return False
 
     def _run_experiment(self):
         rospy.logwarn(f"Experiment running for {self.duration:.1f} seconds using {self.algorithm}")
@@ -222,6 +242,9 @@ class ExperimentRunner:
         return closest_idx, closest_dist
 
     def _analyze_and_plot(self):
+        if not os.path.exists(self.data_path) or os.path.getsize(self.data_path) == 0:
+            rospy.logwarn(f"No data logged at {self.data_path}, skipping analysis")
+            return
         data = np.loadtxt(self.data_path, comments="#")
         if data.size == 0:
             rospy.logwarn("No data logged, skipping analysis")
@@ -242,28 +265,34 @@ class ExperimentRunner:
         total_path = float(np.sum(np.linalg.norm(np.diff(actual_xy, axis=0), axis=1)))
         goal_err = float(np.linalg.norm(actual_xy[-1] - target_xy[-1]))
 
-        lines = [
-            f"algorithm: {self.algorithm}",
-            f"samples: {len(data)}",
-            f"duration: {stamp[-1] - stamp[0]:.2f}s",
-            f"rms_cte: {rms_cte:.4f}",
-            f"mean_abs_cte: {mean_abs_cte:.4f}",
-            f"rms_heading_error: {rms_heading:.4f}",
-            f"speed_rmse: {speed_rmse:.4f}",
-            f"actual_path_length: {total_path:.2f} m",
-            f"goal_position_error: {goal_err:.4f} m",
-        ]
-        with open(self.summary_path, "w") as f:
-            f.write("\n".join(lines))
-        with open(self.index_path, "a") as f:
-            f.write(f"{datetime.now().isoformat()} {self.algorithm} {self.summary_path}\n")
+        if self.run_metrics:
+            lines = [
+                f"algorithm: {self.algorithm}",
+                f"samples: {len(data)}",
+                f"duration: {stamp[-1] - stamp[0]:.2f}s",
+                f"rms_cte: {rms_cte:.4f}",
+                f"mean_abs_cte: {mean_abs_cte:.4f}",
+                f"rms_heading_error: {rms_heading:.4f}",
+                f"speed_rmse: {speed_rmse:.4f}",
+                f"actual_path_length: {total_path:.2f} m",
+                f"goal_position_error: {goal_err:.4f} m",
+            ]
+            with open(self.summary_path, "w") as f:
+                f.write("\n".join(lines))
+            rospy.logwarn(f"Metrics written to {self.summary_path}")
+            if self.run_index:
+                with open(self.index_path, "a") as f:
+                    f.write(f"{datetime.now().isoformat()} {self.algorithm} {self.summary_path}\n")
+                rospy.logwarn(f"Run indexed in {self.index_path}")
 
-        self._plot_paths(target_xy, actual_xy)
-        self._plot_series(stamp, cte, "Cross-track error (m)", "cte.png")
-        self._plot_series(stamp, heading_err, "Heading error (rad)", "heading_error.png")
-        self._plot_speed(stamp, speed, target_speed)
+        if self.run_plots:
+            self._plot_paths(target_xy, actual_xy)
+            self._plot_series(stamp, cte, "Cross-track error (m)", "cte.png")
+            self._plot_series(stamp, heading_err, "Heading error (rad)", "heading_error.png")
+            self._plot_speed(stamp, speed, target_speed)
+            rospy.logwarn(f"Plots written to {self.run_dir}")
 
-        rospy.logwarn(f"Analysis complete, results stored in {self.run_dir}")
+        rospy.logwarn(f"Analysis complete for data: {self.data_path}")
 
     def _plot_paths(self, target_xy, actual_xy):
         plt.figure()

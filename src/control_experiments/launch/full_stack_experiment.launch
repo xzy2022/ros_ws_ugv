@@ -1,9 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <launch>
+    <!-- Parameters -->
     <arg name="algorithm" default="stanley" />
     <arg name="duration" default="60.0" />
     <arg name="results_root" default="" />
     <arg name="require_rviz" default="false" />
+    <arg name="start_gazebo" default="true" />
+    <arg name="start_rviz" default="false" />
     <arg name="start_controller" default="true" />
     <arg name="run_collection" default="true" />
     <arg name="run_metrics" default="true" />
@@ -11,6 +14,20 @@
     <arg name="run_index" default="true" />
     <arg name="existing_data_path" default="" />
 
+    <!-- Gazebo world -->
+    <group if="$(arg start_gazebo)">
+        <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+    </group>
+
+    <!-- Car model + controllers + waypoints -->
+    <include file="$(find car_model)/launch/spawn_car.launch" />
+
+    <!-- Optional RViz -->
+    <group if="$(arg start_rviz)">
+        <node name="rviz" pkg="rviz" type="rviz" output="screen" />
+    </group>
+
+    <!-- Controller experiment runner -->
     <node name="experiment_runner"
           pkg="control_experiments"
           type="experiment_runner.py"

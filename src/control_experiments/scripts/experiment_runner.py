@@ -14,7 +14,7 @@ import numpy as np
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
-from geometry_msgs.msg import PoseStamped, TwistStamped
+from geometry_msgs.msg import PoseStamped, TwistStamped, Twist
 from styx_msgs.msg import Lane
 
 
@@ -31,6 +31,8 @@ class ExperimentRunner:
         self.run_plots = rospy.get_param("~run_plots", True)
         self.run_index = rospy.get_param("~run_index", True)
         self.existing_data_path = rospy.get_param("~existing_data_path", "")
+        self.publish_stop_on_exit = rospy.get_param("~publish_stop_on_exit", True)
+        self.post_stop_delay = rospy.get_param("~post_stop_delay", 1.0)
         results_root = rospy.get_param("~results_root", "")
 
         # paths
@@ -61,6 +63,7 @@ class ExperimentRunner:
         rospy.Subscriber("/smart/rear_pose", PoseStamped, self.pose_cb, queue_size=1)
         rospy.Subscriber("/smart/velocity", TwistStamped, self.vel_cb, queue_size=1)
         rospy.Subscriber("/final_waypoints", Lane, self.waypoints_cb, queue_size=1)
+        self.twist_pub = rospy.Publisher("/smart/cmd_vel", Twist, queue_size=1)
 
         self.controller_process: Optional[subprocess.Popen] = None
 
@@ -92,6 +95,8 @@ class ExperimentRunner:
         time.sleep(1.0)
 
     def _stop_controller(self):
+        if self.publish_stop_on_exit:
+            self._publish_stop_command()
         if self.controller_process and self.controller_process.poll() is None:
             rospy.logwarn("Stopping controller process")
             self.controller_process.terminate()
@@ -100,6 +105,8 @@ class ExperimentRunner:
             except subprocess.TimeoutExpired:
                 rospy.logwarn("Controller did not exit, killing")
                 self.controller_process.kill()
+        if self.post_stop_delay > 0.0:
+            rospy.sleep(self.post_stop_delay)
 
     def pose_cb(self, msg: PoseStamped):
         self.pose = msg
@@ -173,6 +180,10 @@ class ExperimentRunner:
                         f.write(" ".join(f"{v:.6f}" for v in entry) + "\n")
                 rate.sleep()
         rospy.logwarn("Experiment data collection finished")
+        if self.publish_stop_on_exit:
+            self._publish_stop_command()
+        if self.post_stop_delay > 0.0:
+            rospy.sleep(self.post_stop_delay)
 
     def _collect_sample(self):
         px = self.pose.pose.position.x
@@ -333,6 +344,13 @@ class ExperimentRunner:
         path = os.path.join(self.run_dir, "speed.png")
         plt.savefig(path)
         plt.close()
+
+    def _publish_stop_command(self):
+        # Publish a few zero commands to allow downstream nodes to settle before shutdown.
+        stop_cmd = Twist()
+        for _ in range(3):
+            self.twist_pub.publish(stop_cmd)
+            rospy.sleep(0.05)
 
 
 if __name__ == "__main__":

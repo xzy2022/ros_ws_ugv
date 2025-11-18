@@ -13,6 +13,8 @@
     <arg name="run_plots" default="true" />
     <arg name="run_index" default="true" />
     <arg name="existing_data_path" default="" />
+    <arg name="publish_stop_on_exit" default="true" />
+    <arg name="post_stop_delay" default="1.0" />
     <arg name="rviz_config" default="$(find control_experiments)/rviz/smart.rviz"/>
 
     <!-- Gazebo world -->
@@ -40,5 +42,7 @@
         <param name="run_plots" value="$(arg run_plots)" />
         <param name="run_index" value="$(arg run_index)" />
         <param name="existing_data_path" value="$(arg existing_data_path)" />
+        <param name="publish_stop_on_exit" value="$(arg publish_stop_on_exit)" />
+        <param name="post_stop_delay" value="$(arg post_stop_delay)" />
     </node>
 </launch>

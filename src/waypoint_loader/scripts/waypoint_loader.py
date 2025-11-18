@@ -18,6 +18,12 @@ MAX_DECEL = 1.0
 
 
 class WaypointLoader(object):
+    """
+    csv提供 x y yaw
+    发布
+    - /base_waypoints (Lane): 包含位置、朝向、速度等控制信息，供下游控制节点使用。速度由 velocity 参数指定，并进行减速处理以实现平稳停车
+    - /base_path (Path): 仅包含位置信息，供RViz
+    """
 
     def __init__(self):
         rospy.init_node('waypoint_loader', log_level=rospy.DEBUG)
@@ -25,6 +31,7 @@ class WaypointLoader(object):
         self.pub = rospy.Publisher('/base_waypoints', Lane, queue_size=1, latch=True)
         self.pub_path = rospy.Publisher('/base_path', Path, queue_size=1, latch=True)
 
+        # 期望的路径速度，由参数指定，单位为km/h
         self.velocity = self.kmph2mps(rospy.get_param('~velocity'))
         self.new_waypoint_loader(rospy.get_param('~path'))
         rospy.spin()
@@ -48,6 +55,7 @@ class WaypointLoader(object):
         base_path = Path()
         base_path.header.frame_id = 'world'
         with open(fname) as wfile:
+            # csv只提供 x y yaw
             reader = csv.DictReader(wfile, CSV_HEADER)
             for wp in reader:
                 p = Waypoint()
@@ -64,7 +72,8 @@ class WaypointLoader(object):
                 path_element.pose.position.y = p.pose.pose.position.y
                 base_path.poses.append(path_element)
 
-                
+        # 进行减速处理，以实现平稳停车
+        # 减速前的速度由参数指定 self.velocity
         waypoints = self.decelerate(waypoints)
         return waypoints,base_path
 
@@ -84,6 +93,14 @@ class WaypointLoader(object):
         return waypoints
 
     def publish(self, waypoints, base_path):
+        """
+        发布两种消息到不同话题：
+        - lane (/base_waypoints): 完整驾驶指令(Lane类型)，包含位置、朝向、速度等控制信息，供下游控制节点使用
+        - base_path (/base_path): 轻量级几何路径(Path类型)，仅包含位置信息，供RViz可视化工具显示
+        
+        分离发布实现模块化设计：控制算法需要完整指令，而可视化只需几何路径，避免传输冗余数据，优化性能并兼容ROS标准
+        """
+
         lane = Lane()
         lane.header.frame_id = '/world'
         lane.header.stamp = rospy.Time(0)

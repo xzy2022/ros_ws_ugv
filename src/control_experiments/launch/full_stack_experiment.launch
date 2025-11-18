@@ -13,6 +13,7 @@
     <arg name="run_plots" default="true" />
     <arg name="run_index" default="true" />
     <arg name="existing_data_path" default="" />
+    <arg name="rviz_config" default="$(find control_experiments)/rviz/smart.rviz"/>
 
     <!-- Gazebo world -->
     <group if="$(arg start_gazebo)">
@@ -24,15 +25,11 @@
 
     <!-- Optional RViz -->
     <group if="$(arg start_rviz)">
-        <node name="rviz" pkg="rviz" type="rviz" output="screen" />
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config)" output="screen" />
     </group>
 
     <!-- Controller experiment runner -->
-    <node name="experiment_runner"
-          pkg="control_experiments"
-          type="experiment_runner.py"
-          output="screen"
-          respawn="false">
+    <node name="experiment_runner" pkg="control_experiments" type="experiment_runner.py" output="screen" respawn="false">
         <param name="algorithm" value="$(arg algorithm)" />
         <param name="duration" value="$(arg duration)" />
         <param name="results_root" value="$(arg results_root)" />

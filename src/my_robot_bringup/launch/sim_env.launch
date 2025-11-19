@@ -18,7 +18,7 @@
         <arg name="robot_name" value="$(arg robot_name)" />
     </include>
 
-    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" />
+    <!-- <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" /> -->
 
     <group if="$(arg start_gazebo)">
         <include file="$(find my_robot_gazebo)/launch/sim.launch">
@@ -26,9 +26,13 @@
             <arg name="paused" value="$(arg paused)" />
             <arg name="robot_name" value="$(arg robot_name)" />
         </include>
+
+        <include file="$(find my_robot_control)/launch/controllers.launch">
+            <arg name="robot_name" value="$(arg robot_name)" />
+        </include>
     </group>
 
-    <include file="$(find my_robot_control)/launch/controllers.launch"/>
+    <!-- <include file="$(find my_robot_control)/launch/controllers.launch"/> -->
 
     <group if="$(arg start_rviz)">
         <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config)" output="screen" />

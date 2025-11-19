@@ -1,0 +1,19 @@
+robot:
+  cmd_vel_topic: cmd_vel
+  publish_stop_on_exit: true
+  post_stop_delay: 1.0
+
+logging:
+  enable_topic_logger: true
+  topic_logger_output: logs/aligned_topics.jsonl
+
+limits:
+  max_speed: 2.0
+
+topics:
+  cmd_vel: cmd_vel
+  odom: odom
+  ground_truth: ground_truth/state
+
+visualization:
+  frame_id: world

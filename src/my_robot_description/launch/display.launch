@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="model" default="$(find my_robot_description)/urdf/smart.xacro" />
+    <arg name="robot_name" default="smart" />
+    <arg name="use_gui" default="true" />
+
+    <param name="robot_description" command="$(find xacro)/xacro $(arg model) roboname:='$(arg robot_name)'" />
+
+    <group if="$(arg use_gui)">
+        <node pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" name="joint_state_publisher" />
+    </group>
+    <group unless="$(arg use_gui)">
+        <node pkg="joint_state_publisher" type="joint_state_publisher" name="joint_state_publisher" />
+    </group>
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen" />
+</launch>

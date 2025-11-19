@@ -1,0 +1,44 @@
+<?xml version="1.0" ?>
+
+<robot name="box"
+    xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+    <!-- 宏属性定义 -->
+    <xacro:property name="length" value="1"/>
+    <xacro:property name="width" value="1"/>
+    <xacro:property name="height" value="1"/>
+
+    <!-- 几何 link -->
+    <link name="base_link">
+        <!-- 碰撞属性 -->
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${length} ${width} ${height}"/>
+            </geometry>
+        </collision>
+        <!-- 视觉属性 -->
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <box size="${length} ${width} ${height}"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <!-- 惯性 joint -->
+    <joint name="inertial_joint" type="fixed">
+        <parent link="base_link"/>
+        <child link="main_mass"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <!-- 质量 link -->
+    <link name="main_mass" type="fixed">
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <mass value="1000"/>
+            <inertia ixx="166.6666" ixy="0.000000" ixz="0.000000" iyy="166.6666" iyz="0.000000" izz="166.6666"/>
+        </inertial>
+    </link>
+</robot>

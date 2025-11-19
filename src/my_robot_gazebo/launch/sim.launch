@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="world_file" default="$(find my_robot_gazebo)/worlds/empty_track.world" />
+    <arg name="paused" default="false" />
+    <arg name="robot_name" default="smart" />
+
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="paused" value="$(arg paused)" />
+        <arg name="world_name" value="$(arg world_file)" />
+    </include>
+
+    <include file="$(find my_robot_gazebo)/launch/spawn_robot.launch">
+        <arg name="robot_name" value="$(arg robot_name)" />
+    </include>
+</launch>

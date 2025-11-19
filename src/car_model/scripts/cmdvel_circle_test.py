@@ -65,6 +65,12 @@ class CircleCmdVelTest:
             self.publish_cmd(0.0, 0.0)
             rate.sleep()
 
+        # stop collecting new samples to avoid concurrent mutation during save
+        try:
+            self.pose_sub.unregister()
+        except Exception:
+            pass
+
         if len(self.pose_buffer) < 2:
             rospy.logwarn("Not enough pose samples collected to evaluate trajectory.")
             return
@@ -91,16 +97,19 @@ class CircleCmdVelTest:
         timestamp = time.strftime("%Y%m%d-%H%M%S")
         txt_path = os.path.join(self.output_dir, f"circle_{timestamp}.txt")
 
+        # snapshot to avoid deque mutation during iteration
+        pose_samples = list(self.pose_buffer)
+
         with open(txt_path, "w") as f:
             f.write("# linear_speed: %.3f m/s\n" % self.linear_speed)
             f.write("# radius_cmd: %.3f m\n" % self.radius)
             f.write("# angular_speed_cmd: %.3f rad/s\n" % self.angular_speed)
             f.write("# t[s]\tx[m]\ty[m]\tyaw[rad]\n")
-            for t_sec, x, y, yaw in self.pose_buffer:
+            for t_sec, x, y, yaw in pose_samples:
                 f.write(f"{t_sec:.3f}\t{x:.6f}\t{y:.6f}\t{yaw:.6f}\n")
 
-        xs = [p[1] for p in self.pose_buffer]
-        ys = [p[2] for p in self.pose_buffer]
+        xs = [p[1] for p in pose_samples]
+        ys = [p[2] for p in pose_samples]
 
         center = self._compute_expected_center()
         if center:

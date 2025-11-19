@@ -34,8 +34,9 @@ class CmdVel2Gazebo:
             '/smart/rear_right_velocity_controller/command', Float64, queue_size=1)
 
         # 初始速度和轮胎角度为0
-        self.rear_wheel_speed = 0
-        self.ideal_steer = 0
+        self.V = 0
+        self.Omega = 0
+
         self.lastMsg = rospy.Time.now()
 
         # Ackermann 几何计算类
@@ -51,14 +52,10 @@ class CmdVel2Gazebo:
         
 
     def callback(self, data):
+        # /cmd_vel话题的回调函数
         # w = v / r
-        if self.wheel_radius <= 0:
-            rospy.logwarn_once("wheel_radius must be > 0; ignoring speed command")
-            self.rear_wheel_speed = 0
-        else:
-            self.rear_wheel_speed = data.linear.x / self.wheel_radius
-        # 限制理想转向角，使阿克曼转向达到最大值
-        self.ideal_steer = self.ackermann.clamp_ideal_steer(data.angular.z)
+        self.V = data.linear.x  # 线速度
+        self.Omega = data.angular.z  # 角速度
         self.lastMsg = rospy.Time.now()
 
     def publish(self):
@@ -80,8 +77,11 @@ class CmdVel2Gazebo:
 
             return
 
-        # self.ideal_steer是阿克曼模型中虚拟前轮的弧度转向角增量
-        rearL, rearR, steerL, steerR = self.ackermann.wheel_commands(self.ideal_steer, self.rear_wheel_speed)
+        # self.rear_wheel_w 等效自行车模型的后轮角速度（弧度/秒）
+        # self.ideal_steer 等效自行车模型的前轮转向角（弧度）
+        ideal_steer, rear_wheel_w = self.ackermann.bicycle_model(self.V, self.Omega)
+
+        rearL, rearR, steerL, steerR = self.ackermann.wheel_commands(ideal_steer, rear_wheel_w)
 
         msgRearL = Float64()
         msgRearL.data = rearL

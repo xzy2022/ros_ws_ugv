@@ -1,20 +1,18 @@
 <launch>
-  <arg name="topics" default="['/cmd_vel', '/smart/rear_pose', '/smart/center_pose', '/smart/velocity']" />
-  <arg name="log_rate" default="10.0" />
-  <arg name="slop" default="0.05" />
-  <arg name="max_age" default="5.0" />
-  <arg name="buffer_size" default="200" />
-  <arg name="output_file" default="" />
+    <arg name="topics" default="['/smart/cmd_vel', '/smart/rear_pose', '/smart/center_pose', '/smart/velocity']" />
+    <arg name="log_rate" default="10.0" />
+    <arg name="slop" default="0.05" />
+    <arg name="max_age" default="5.0" />
+    <arg name="buffer_size" default="200" />
+    <!-- 默认写到工作空间根目录 logs 目录，可覆盖为绝对路径或相对 logs 的子路径/文件名 -->
+    <arg name="output_file" default="$(find car_model)/../../logs/aligned_topics.jsonl" />
 
-  <node pkg="car_model"
-        type="aligned_topic_logger.py"
-        name="aligned_topic_logger"
-        output="screen">
-    <param name="topics" value="$(arg topics)" />
-    <param name="log_rate" value="$(arg log_rate)" />
-    <param name="slop" value="$(arg slop)" />
-    <param name="max_age" value="$(arg max_age)" />
-    <param name="buffer_size" value="$(arg buffer_size)" />
-    <param name="output_file" value="$(arg output_file)" />
-  </node>
+    <node pkg="car_model" type="aligned_topic_logger.py" name="aligned_topic_logger" output="screen">
+        <param name="topics" value="$(arg topics)" />
+        <param name="log_rate" value="$(arg log_rate)" />
+        <param name="slop" value="$(arg slop)" />
+        <param name="max_age" value="$(arg max_age)" />
+        <param name="buffer_size" value="$(arg buffer_size)" />
+        <param name="output_file" value="$(arg output_file)" />
+    </node>
 </launch>

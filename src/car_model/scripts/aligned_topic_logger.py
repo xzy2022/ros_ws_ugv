@@ -15,7 +15,7 @@ class AlignedTopicLogger:
         rospy.init_node("aligned_topic_logger", anonymous=True)
 
         self.topic_types = {
-            "/cmd_vel": Twist,
+            "/smart/cmd_vel": Twist,
             "/smart/rear_pose": PoseStamped,
             "/smart/center_pose": PoseStamped,
             "/smart/velocity": TwistStamped,
@@ -66,13 +66,18 @@ class AlignedTopicLogger:
         return filtered
 
     def _resolve_output_file(self, output_param: str) -> str:
-        ros_home = os.environ.get("ROS_HOME", os.path.expanduser("~/.ros"))
-        default_dir = os.path.join(ros_home, "car_model_logs")
+        # 默认写到工作空间根目录下的 logs/
+        workspace_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+        default_dir = os.path.join(workspace_root, "logs")
         os.makedirs(default_dir, exist_ok=True)
 
         if not output_param:
             timestamp = int(rospy.Time.now().to_sec())
             return os.path.join(default_dir, f"aligned_topics_{timestamp}.jsonl")
+
+        # 如果传入的是目录，自动补一个文件名
+        if output_param.endswith(os.path.sep):
+            output_param = os.path.join(output_param, "aligned_topics.jsonl")
 
         if not os.path.isabs(output_param):
             output_param = os.path.join(default_dir, output_param)

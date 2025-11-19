@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<launch>
+    <!-- Parameters -->
+    <arg name="algorithm" default="stanley" />
+    <arg name="results_root" default="" />
+    <arg name="require_rviz" default="false" />
+    <arg name="start_gazebo" default="true" />
+    <arg name="start_rviz" default="false" />
+    <arg name="start_controller" default="true" />
+    <arg name="run_collection" default="true" />
+    <arg name="run_metrics" default="true" />
+    <arg name="run_plots" default="true" />
+    <arg name="run_index" default="true" />
+    <arg name="existing_data_path" default="" />
+    <arg name="publish_stop_on_exit" default="true" />
+    <arg name="post_stop_delay" default="1.0" />
+    <arg name="rviz_config" default="$(find control_experiments)/rviz/smart.rviz"/>
+    <!-- Circle test / cmd_vel bridge -->
+    <arg name="run_circle_test" default="false" />
+    <arg name="run_cmdvel_bridge" default="true" />
+    <arg name="run_pose_updater" default="true" />
+    <arg name="run_topic_logger" default="true" />
+    <arg name="topic_logger_output" default="$(find car_model)/../../logs/aligned_topics.jsonl" />
+    <arg name="linear_speed" default="2.0" />
+    <arg name="radius" default="5.0" />
+    <arg name="duration" default="30.0" />
+
+    <!-- 加载世界 -->
+    <group if="$(arg start_gazebo)">
+        <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+    </group>
+
+    <!-- 加载车辆模型 -->
+    <include file="$(find car_model)/launch/spawn_car.launch" />
+
+
+
+    <!-- rviz -->
+    <group if="$(arg start_rviz)">
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config)" output="screen" />
+    </group>
+
+    <!-- 将 /smart/cmd_vel 转换为四轮控制器命令 -->
+    <group if="$(arg run_cmdvel_bridge)">
+        <node name="cmdvel2gazebo" pkg="car_model" type="cmdvel2gazebo.py" output="screen">
+            <param name="wheel_radius" value="0.3" />
+            <param name="wheel_base" value="1.868" />
+            <param name="front_tread" value="1.284" />
+            <param name="rear_tread" value="1.284" />
+            <param name="max_steer_inside" value="0.6" />
+            <param name="cmd_timeout" value="0.2" />
+            <param name="publish_rate" value="20.0" />
+            <param name="cmd_vel_topic" value="/smart/cmd_vel" />
+        </node>
+    </group>
+
+    <!-- 从 Gazebo 获取真实位姿与速度 -->
+    <group if="$(arg run_pose_updater)">
+        <node name="vehicle_pose_and_velocity_updater" pkg="car_model" type="vehicle_pose_and_velocity_updater.py" output="screen" />
+    </group>
+
+    <!-- 绕圈测试：发布恒定 cmd_vel 并记录轨迹 -->
+    <group if="$(arg run_circle_test)">
+        <node name="cmdvel_circle_test" pkg="car_model" type="cmdvel_circle_test.py" output="screen">
+            <param name="linear_speed" value="$(arg linear_speed)" />
+            <param name="radius" value="$(arg radius)" />
+            <param name="duration" value="$(arg duration)" />
+        </node>
+    </group>
+
+    <!-- 加载日志系统 -->
+    <!-- <group if="$(arg run_topic_logger)">
+        <include file="$(find car_model)/launch/aligned_topic_logger.launch">
+            <arg name="output_file" value="$(arg topic_logger_output)" />
+        </include>
+    </group> -->
+
+</launch>

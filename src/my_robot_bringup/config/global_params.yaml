@@ -17,3 +17,9 @@ topics:
 
 visualization:
   frame_id: world
+
+# 物理参数 (供 Driver 读取)
+vehicle_physics:
+  wheelbase: 0.335  # 你的车轴距
+  track_width: 0.25 # 你的车轮距
+  wheel_radius: 0.05

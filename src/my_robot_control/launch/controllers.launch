@@ -1,0 +1,14 @@
+<launch>
+    <rosparam file="$(find my_robot_control)/config/gazebo_controllers.yaml" command="load"/>
+
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="/smart" args="joint_state_controller 
+          rear_right_velocity_controller 
+          rear_left_velocity_controller 
+          front_right_steering_position_controller 
+          front_left_steering_position_controller"/>
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" respawn="false" output="screen">
+        <remap from="/joint_states" to="/smart/joint_states" />
+    </node>
+
+</launch>

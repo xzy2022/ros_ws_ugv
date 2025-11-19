@@ -28,6 +28,8 @@
         </include>
     </group>
 
+    <include file="$(find my_robot_control)/launch/controllers.launch"/>
+
     <group if="$(arg start_rviz)">
         <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config)" output="screen" />
     </group>

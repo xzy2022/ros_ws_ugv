@@ -5,6 +5,8 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import Float64
 import math
 
+from ackermann_utils import AckermannKinematics
+
 class CmdVel2Gazebo:
 
     def __init__(self):
@@ -36,16 +38,10 @@ class CmdVel2Gazebo:
         self.ideal_steer = 0
         self.lastMsg = rospy.Time.now()
 
-        # 仅使用内侧轮胎时最大转向角的转弯半径
-        # tan(maxsteerInside) = wheelbase/radius --> 求解此角度下的最大半径
-        rMax = self.L / math.tan(self.maxsteerInside)
-
-        # 内侧轮胎的半径为rMax，因此理想中间轮胎的半径（rIdeal）为rMax+轮距/2
-        rIdeal = rMax + (self.T_front / 2.0)
-
-        # 理想中间轮胎的最大转向角
-        # tan(角度) = wheelbase/radius
-        self.maxsteer = math.atan2(self.L, rIdeal)
+        # Ackermann 几何计算类
+        self.ackermann = AckermannKinematics(self.L, self.T_front, self.T_rear, self.maxsteerInside)
+        # 理想中间轮胎的最大转向角（基于内侧轮胎极限）
+        self.maxsteer = self.ackermann.max_ideal_steer
 
         # 循环
         rate = rospy.Rate(self.loop_rate)  # 以配置的赫兹频率运行
@@ -62,7 +58,7 @@ class CmdVel2Gazebo:
         else:
             self.rear_wheel_speed = data.linear.x / self.wheel_radius
         # 限制理想转向角，使阿克曼转向达到最大值
-        self.ideal_steer = max(-self.maxsteer, min(self.maxsteer, data.angular.z))
+        self.ideal_steer = self.ackermann.clamp_ideal_steer(data.angular.z)
         self.lastMsg = rospy.Time.now()
 
     def publish(self):
@@ -84,52 +80,22 @@ class CmdVel2Gazebo:
 
             return
 
-        # self.z是阿克曼模型中虚拟前轮的弧度转向角增量
-        if self.ideal_steer != 0:
-            T_rear = self.T_rear
-            T_front = self.T_front
-            L = self.L
-            # self.v是线性*速度*
-            r = L / math.fabs(math.tan(self.ideal_steer))
+        # self.ideal_steer是阿克曼模型中虚拟前轮的弧度转向角增量
+        rearL, rearR, steerL, steerR = self.ackermann.wheel_commands(self.ideal_steer, self.rear_wheel_speed)
 
-            rL_rear = r - (math.copysign(1, self.ideal_steer) * (T_rear / 2.0))
-            rR_rear = r + (math.copysign(1, self.ideal_steer) * (T_rear / 2.0))
-            rL_front = r - (math.copysign(1, self.ideal_steer) * (T_front / 2.0))
-            rR_front = r + (math.copysign(1, self.ideal_steer) * (T_front / 2.0))
-            msgRearR = Float64()
-            # 当我们向左转（正角度）时，右轮会转得稍快一些
-            # 转速与外侧/理想半径成比例
-            msgRearR.data = self.rear_wheel_speed * rR_rear / r
-            msgRearL = Float64()
-            # 当我们向左转（正角度）时，左轮会转得稍慢一些
-            # 转速与内侧/理想半径成比例
-            msgRearL.data = self.rear_wheel_speed * rL_rear / r
+        msgRearL = Float64()
+        msgRearL.data = rearL
+        msgRearR = Float64()
+        msgRearR.data = rearR
+        self.pub_rearL.publish(msgRearL)
+        self.pub_rearR.publish(msgRearR)
 
-            self.pub_rearL.publish(msgRearL)
-            self.pub_rearR.publish(msgRearR)
-
-            msgSteerL = Float64()
-            msgSteerR = Float64()
-            # 左轮角度直接从几何关系求解
-            msgSteerL.data = math.atan2(L, rL_front) * math.copysign(1, self.ideal_steer)
-            self.pub_steerL.publish(msgSteerL)
-    
-            # 右轮角度直接从几何关系求解
-            msgSteerR.data = math.atan2(L, rR_front) * math.copysign(1, self.ideal_steer)
-            self.pub_steerR.publish(msgSteerR)
-        else:
-            # 如果我们没有转弯
-            msgRear = Float64()
-            msgRear.data = self.rear_wheel_speed
-            self.pub_rearL.publish(msgRear)
-            # msgRear.data = 0;
-            self.pub_rearR.publish(msgRear)
-
-            msgSteer = Float64()
-            msgSteer.data = self.ideal_steer
-
-            self.pub_steerL.publish(msgSteer)
-            self.pub_steerR.publish(msgSteer)
+        msgSteerL = Float64()
+        msgSteerL.data = steerL
+        msgSteerR = Float64()
+        msgSteerR.data = steerR
+        self.pub_steerL.publish(msgSteerL)
+        self.pub_steerR.publish(msgSteerR)
 
 
 if __name__ == '__main__':

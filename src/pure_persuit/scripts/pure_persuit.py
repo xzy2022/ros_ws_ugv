@@ -13,6 +13,8 @@ from gazebo_msgs.msg import ModelStates
 import tf
 import rospy
 
+# 设定一个前视距离常量，单位为米
+# 实际中可以设置为关于速度的函数，比如速度越高，前视距离越大
 HORIZON = 6.0
 
 class PurePersuit:
@@ -51,6 +53,7 @@ class PurePersuit:
 
 	def calculateTwistCommand(self):
 		lad = 0.0 #look ahead distance accumulator
+		# 跟踪的点初始化为局部路径中的最后一个点
 		targetIndex = len(self.currentWaypoints.waypoints) - 1
 		for i in range(len(self.currentWaypoints.waypoints)):
 			if((i+1) < len(self.currentWaypoints.waypoints)):
@@ -58,14 +61,16 @@ class PurePersuit:
 				this_y = self.currentWaypoints.waypoints[i].pose.pose.position.y
 				next_x = self.currentWaypoints.waypoints[i+1].pose.pose.position.x
 				next_y = self.currentWaypoints.waypoints[i+1].pose.pose.position.y
+				# 计算路径点之间的欧式距离并累加
 				lad = lad + math.hypot(next_x - this_x, next_y - this_y)
+				# 找到第一个超过HORIZON的路径点作为跟踪目标点
 				if(lad > HORIZON):
 					targetIndex = i+1
 					break
 
 
 		targetWaypoint = self.currentWaypoints.waypoints[targetIndex]
-
+		# 目标速度就是局部路径中的第一个点的速度，而这个速度其实是生成全局路径时指定的速度（参数指定 + 减速平滑）
 		targetSpeed = self.currentWaypoints.waypoints[0].twist.twist.linear.x
 
 		targetX = targetWaypoint.pose.pose.position.x
@@ -78,14 +83,18 @@ class PurePersuit:
 		yaw = euler[2]
 		#get angle difference
 		alpha = math.atan2(targetY - currentY, targetX - currentX) - yaw
-		l = math.sqrt(math.pow(currentX - targetX, 2) + math.pow(currentY - targetY, 2))
+		
+        # 计算到目标点的距离
+		l = math.hypot(currentX - targetX, currentY - targetY)
 		if(l > 0.5):
+			# 距离大于0.5米时才进行角速度与线速度控制
 			theta = math.atan(2 * 1.868 * math.sin(alpha) / l)
-			# #get twist command
 			twistCmd = Twist()
 			twistCmd.linear.x = targetSpeed
 			twistCmd.angular.z = theta 
 		else:
+			# 距离小于等于0.5米时发布零速度，停止运动
+			# 这意味这当前局部路径内没有足够远的路径点可供跟踪，可能意味着到达终点
 			twistCmd = Twist()
 			twistCmd.linear.x = 0
 			twistCmd.angular.z = 0

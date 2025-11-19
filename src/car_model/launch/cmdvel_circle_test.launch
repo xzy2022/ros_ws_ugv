@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch>
+    <arg name="linear_speed" default="2.0" />
+    <arg name="radius" default="5.0" />
+    <arg name="duration" default="30.0" />
+    <arg name="start_gazebo" default="true" />
+    <arg name="start_rviz" default="false" />
+    <arg name="rviz_config" default="$(find control_experiments)/rviz/smart.rviz"/>
+
+    <!-- Gazebo world -->
+    <group if="$(arg start_gazebo)">
+        <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+    </group>
+
+    <!-- Spawn smart vehicle and controllers (no waypoint pipeline) -->
+    <include file="$(find car_model)/launch/spawn_xacro.launch">
+        <arg name="x" value="0.0"/>
+        <arg name="y" value="0.0"/>
+        <arg name="z" value="0.0"/>
+        <arg name="urdf_robot_file" value="$(find car_model)/urdf/smart.xacro"/>
+        <arg name="robot_name" value="smart"/>
+    </include>
+
+    <include file="$(find car_model)/launch/control.launch">
+        <arg name="robot_name" value="smart"/>
+        <arg name="config_file" value="smart_control_config.yaml"/>
+    </include>
+
+    <!-- Optional RViz -->
+    <group if="$(arg start_rviz)">
+        <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config)" output="screen" />
+    </group>
+
+    <!-- Circle test node: publishes cmd_vel and records trajectory -->
+    <node name="cmdvel_circle_test" pkg="car_model" type="cmdvel_circle_test.py" output="screen">
+        <param name="linear_speed" value="$(arg linear_speed)" />
+        <param name="radius" value="$(arg radius)" />
+        <param name="duration" value="$(arg duration)" />
+    </node>
+</launch>

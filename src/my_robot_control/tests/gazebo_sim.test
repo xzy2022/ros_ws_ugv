@@ -6,6 +6,7 @@
         <arg name="start_gazebo" value="true" />
         <arg name="start_rviz" value="false" />
         <arg name="use_sim_time" value="true" />
+        <arg name="world_file" value="$(find gazebo_ros)/worlds/empty.world" />
     </include>
 
     <test test-name="test_gazebo_motion"

@@ -8,6 +8,9 @@
           name="ackermann_driver"
           output="screen"
           ns="$(arg robot_name)">
+        <param name="wheelbase" value="1.868" />
+        <param name="track_width" value="1.284" />
+        <param name="wheel_radius" value="0.3" />
         <param name="cmd_vel_topic" value="cmd_vel" />
     </node>
 

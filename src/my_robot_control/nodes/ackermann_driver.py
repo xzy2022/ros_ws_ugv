@@ -17,11 +17,11 @@ class AckermannDriverNode:
 
         # 1. 从参数服务器加载车辆物理参数 (优先节点私有参数，其次机器人命名空间内的全局 YAML)
         wheelbase = rospy.get_param("~wheelbase",
-                                    rospy.get_param(f"{robot_ns}vehicle_physics/wheelbase", 0.3))
+                                    rospy.get_param(f"{robot_ns}vehicle_physics/wheelbase", 1.868))
         track_width = rospy.get_param("~track_width",
-                                      rospy.get_param(f"{robot_ns}vehicle_physics/track_width", 0.2))
+                                      rospy.get_param(f"{robot_ns}vehicle_physics/track_width", 1.284))
         wheel_radius = rospy.get_param("~wheel_radius",
-                                       rospy.get_param(f"{robot_ns}vehicle_physics/wheel_radius", 0.05))
+                                       rospy.get_param(f"{robot_ns}vehicle_physics/wheel_radius", 0.3))
 
         # 2. 初始化你的纯逻辑算法库
         self.kinematics = AckermannKinematics(

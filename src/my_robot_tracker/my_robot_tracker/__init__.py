@@ -7,15 +7,18 @@ from .algorithms import (
     LateralController,
     PurePursuit,
     Stanley,
+    TrackerOutput,
 )
-from .pid import PID
+from .pid import PID, PIDConfig
 
 __all__ = [
     "ControlCommand",
+    "TrackerOutput",
     "PathPoint",
     "VehicleState",
     "LateralController",
     "PurePursuit",
     "Stanley",
     "PID",
+    "PIDConfig",
 ]

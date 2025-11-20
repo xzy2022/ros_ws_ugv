@@ -3,13 +3,19 @@
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Iterable, Optional, Sequence
+from typing import Iterable, Optional, Sequence, Tuple
 
 
 @dataclass
 class ControlCommand:
     steering_angle: float  # radians
     velocity: float        # m/s
+
+
+@dataclass
+class TrackerOutput:
+    steering_angle: float  # delta (rad)
+    angular_velocity: float  # omega (rad/s)
 
 
 @dataclass
@@ -77,6 +83,27 @@ class PurePursuit(LateralController):
         alpha = math.atan2(target.y, target.x)
         delta = math.atan2(2.0 * self.L * math.sin(alpha), lookahead_dist)
         return _normalize_angle(delta)
+
+    # === Convenience API matching PPT签名 (基于横向误差与预瞄距离) ===
+    def compute_command(self, v_target: float, lateral_error: float, lookahead_dist: float) -> TrackerOutput:
+        """Compute steering and yaw rate using precomputed lookahead geometry."""
+        if abs(lookahead_dist) < 1e-6:
+            return TrackerOutput(0.0, 0.0)
+
+        curvature = (2.0 * lateral_error) / (lookahead_dist ** 2)
+        delta = math.atan(self.L * curvature)
+        omega = (v_target / self.L) * math.tan(delta) if abs(self.L) > 1e-6 else 0.0
+        return TrackerOutput(steering_angle=_normalize_angle(delta), angular_velocity=omega)
+
+    @staticmethod
+    def find_lookahead_point(path_points: Sequence[Tuple[float, float, float]], current_x: float, current_y: float, lookahead_dist: float) -> Optional[Tuple[float, float, float]]:
+        """简单几何搜索：返回第一个距离 >= lookahead 的全局坐标点 (x, y, v)."""
+        for p in path_points:
+            dx = p[0] - current_x
+            dy = p[1] - current_y
+            if math.hypot(dx, dy) >= lookahead_dist:
+                return p
+        return path_points[-1] if path_points else None
 
 
 class Stanley(LateralController):

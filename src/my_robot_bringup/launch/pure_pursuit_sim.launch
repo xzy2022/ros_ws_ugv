@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- Reuse base sim environment -->
+    <include file="$(find my_robot_bringup)/launch/sim_env.launch">
+        <arg name="start_gazebo" value="true" />
+        <arg name="start_rviz" value="false" />
+        <arg name="paused" value="false" />
+        <arg name="use_sim_time" value="true" />
+    </include>
+
+    <!-- Global path loader using copied CSV -->
+    <node pkg="my_robot_planning" type="global_path_loader.py" name="global_loader" output="screen">
+        <param name="csv_path" value="$(find my_robot_bringup)/data/waypoints.csv"/>
+        <param name="velocity_kmph" value="10.0"/>
+        <param name="max_decel" value="1.0"/>
+    </node>
+
+    <!-- Local path planner to slice waypoints -->
+    <node pkg="my_robot_planning" type="local_path_planner.py" name="local_planner" output="screen">
+        <param name="lookahead_wps" value="20"/>
+        <param name="frequency" value="10.0"/>
+    </node>
+
+    <!-- Pure pursuit tracker -->
+    <node pkg="my_robot_tracker" type="pure_pursuit_node.py" name="pure_pursuit" output="screen">
+        <rosparam file="$(find my_robot_tracker)/config/tracking.yaml" command="load"/>
+    </node>
+</launch>

@@ -66,3 +66,4 @@ class LocalPathPlanner:
     def extract_local_path(self, start_idx: int, length: int) -> List[PathPoint]:
         end_idx = min(start_idx + length, len(self.points))
         return self.points[start_idx:end_idx]
+

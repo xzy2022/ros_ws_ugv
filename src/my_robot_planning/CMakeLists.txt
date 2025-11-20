@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(my_robot_control)
+project(my_robot_planning)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,12 +8,12 @@ project(my_robot_control)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  rospy
-  std_msgs
   geometry_msgs
+  my_robot_msgs
+  nav_msgs
+  rospy
+  tf
 )
-
-catkin_python_setup()
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -70,10 +70,9 @@ catkin_python_setup()
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs
-# )
+catkin_package(
+  CATKIN_DEPENDS geometry_msgs my_robot_msgs nav_msgs rospy tf
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -104,8 +103,14 @@ catkin_python_setup()
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-  CATKIN_DEPENDS geometry_msgs rospy std_msgs
+catkin_install_python(PROGRAMS
+  nodes/global_path_loader.py
+  nodes/local_path_planner.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY config
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
 ###########
@@ -121,7 +126,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/my_robot_control.cpp
+#   src/${PROJECT_NAME}/my_robot_planning.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -132,7 +137,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/my_robot_control_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/my_robot_planning_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -158,19 +163,10 @@ include_directories(
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-catkin_install_python(PROGRAMS
-  scripts/wheel_control_test.py
-  nodes/ackermann_driver.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-if(CATKIN_ENABLE_TESTING)
-  find_package(rostest REQUIRED)
-  catkin_add_nosetests(tests)
-  add_rostest(tests/driver_logic.test)
-  add_rostest(tests/gazebo_sim.test)
-  add_rostest(tests/wheel_response.test)
-endif()
+# catkin_install_python(PROGRAMS
+#   scripts/my_python_script
+#   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
@@ -205,7 +201,7 @@ endif()
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_my_robot_control.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_my_robot_planning.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

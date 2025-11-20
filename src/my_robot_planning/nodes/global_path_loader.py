@@ -5,14 +5,13 @@ import tf.transformations as tft
 from geometry_msgs.msg import PoseStamped, Quaternion
 from nav_msgs.msg import Path
 from my_robot_msgs.msg import Lane, Waypoint
-from my_robot_control.navigation import GlobalPathManager
+from my_robot_planning.navigation import GlobalPathManager
 
 
 class GlobalPathLoaderNode:
     def __init__(self):
         rospy.init_node("global_path_loader")
 
-        # Parameters
         self.csv_path = rospy.get_param("~csv_path", "")
         self.velocity_kmph = rospy.get_param("~velocity_kmph", 15.0)
         self.max_decel = rospy.get_param("~max_decel", 1.0)
@@ -21,7 +20,6 @@ class GlobalPathLoaderNode:
             rospy.logfatal("csv_path parameter is required")
             raise rospy.ROSInitException("Missing csv_path parameter")
         if not os.path.isabs(self.csv_path) and "$(find" in self.csv_path:
-            # let rosparam substitution resolve; leave as-is
             pass
         elif not os.path.exists(self.csv_path):
             rospy.logfatal("CSV path does not exist: %s", self.csv_path)
@@ -32,7 +30,6 @@ class GlobalPathLoaderNode:
         self.lane_pub = rospy.Publisher("/base_waypoints", Lane, queue_size=1, latch=True)
         self.viz_pub = rospy.Publisher("/base_path", Path, queue_size=1, latch=True)
 
-        # Load once and publish
         self.load_and_publish()
         rospy.spin()
 

@@ -3,7 +3,7 @@ import rospy
 from geometry_msgs.msg import PoseStamped
 from nav_msgs.msg import Odometry, Path
 from my_robot_msgs.msg import Lane, Waypoint
-from my_robot_control.navigation import LocalPathPlanner, PathPoint
+from my_robot_planning.navigation import LocalPathPlanner, PathPoint
 
 
 class LocalPlannerNode:
@@ -14,7 +14,7 @@ class LocalPlannerNode:
         self.frequency = rospy.get_param("~frequency", 20.0)
 
         self.planner_logic = None
-        self.global_waypoints = []  # store original waypoints for publishing
+        self.global_waypoints = []
         self.current_pose = None
 
         rospy.Subscriber("/smart/ground_truth/state", Odometry, self.pose_cb)
@@ -42,7 +42,6 @@ class LocalPlannerNode:
         rospy.loginfo("Global path received: %d waypoints", len(points))
 
     def pose_cb(self, msg):
-        # Handle both PoseStamped and Odometry
         if isinstance(msg, Odometry):
             self.current_pose = msg.pose.pose
         elif isinstance(msg, PoseStamped):
@@ -66,7 +65,6 @@ class LocalPlannerNode:
         path_msg.header = lane.header
 
         for i, p in enumerate(local_points):
-            # Use the cached original waypoint when possible for richer data
             global_idx = closest_idx + i
             if global_idx < len(self.global_waypoints):
                 wp = self.global_waypoints[global_idx]

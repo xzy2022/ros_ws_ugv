@@ -1,0 +1,8 @@
+global_path:
+  csv_path: "$(find my_robot_planning)/data/track.csv"
+  velocity_kmph: 15.0
+  max_decel: 1.0
+
+local_planner:
+  lookahead_wps: 20
+  frequency: 20

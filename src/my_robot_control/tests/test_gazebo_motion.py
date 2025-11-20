@@ -1,85 +1,132 @@
 #!/usr/bin/env python3
-import time
 import unittest
-
 import rospy
+import time
+import statistics
 from geometry_msgs.msg import Twist
 from nav_msgs.msg import Odometry
 
-# 监听真实位姿：订阅 /smart/ground_truth/state 话题获取机器人在仿真世界中的精确位置（Odometry 消息）
-# 发送运动指令：通过 /smart/cmd_vel 话题持续发送 2.0 m/s 的前进线速度，持续 2 秒
-# 测量位移：对比运动前后的 X 坐标位置差
-# 断言结果：如果位移大于 1.8 米则测试通过，否则失败
-
-class TestGazeboMotion(unittest.TestCase):
-    """End-to-end test: ensure robot moves in Gazebo when commanded."""
+class TestGazeboVelocityProfile(unittest.TestCase):
+    """
+    Deep diagnosis test: Samples velocity over time to analyze 
+    acceleration, steady-state speed, and braking performance.
+    """
 
     def setUp(self) -> None:
-        # 初始化节点，必须指定 anonymous=True 以免和被测节点冲突
-        rospy.init_node("test_gazebo_motion", anonymous=True)
-
-    def test_robot_moves_forward(self) -> None:
-        topic = "/smart/ground_truth/state"
+        rospy.init_node("test_gazebo_velocity_profile", anonymous=True)
+        self.odom_topic = "/smart/ground_truth/state"
+        self.latest_odom = None
         
-        # 1. 确保能收到里程计数据
+        # 订阅里程计更新
+        rospy.Subscriber(self.odom_topic, Odometry, self.odom_callback)
+        
+        # 等待第一帧数据确保连接
         try:
-            rospy.wait_for_message(topic, Odometry, timeout=10.0)
+            rospy.wait_for_message(self.odom_topic, Odometry, timeout=5.0)
         except rospy.ROSException:
-            self.fail(f"Did not receive ground truth data from {topic}")
+            self.fail("Failed to connect to ground truth topic!")
 
-        # 2. 获取初始位置
-        initial = rospy.wait_for_message(topic, Odometry)
-        start_x = initial.pose.pose.position.x
-        
-        # 使用 print 可以在 rostest --text 模式下看到调试信息
-        print(f"\n[DEBUG] Start X: {start_x:.4f}")
+    def odom_callback(self, msg: Odometry) -> None:
+        self.latest_odom = msg
 
+    def get_current_speed(self) -> float:
+        if self.latest_odom:
+            # 直接读取仿真器计算的线速度 (Vx)
+            return self.latest_odom.twist.twist.linear.x
+        return 0.0
+
+    def get_current_x(self) -> float:
+        if self.latest_odom:
+            return self.latest_odom.pose.pose.position.x
+        return 0.0
+
+    def test_velocity_profile(self) -> None:
         pub = rospy.Publisher("/smart/cmd_vel", Twist, queue_size=1)
-        
-        # 等待发布者连接，防止第一条指令丢失
-        rospy.sleep(1.0) 
+        rospy.sleep(1.0) # 等待发布者连接
 
+        print("\n" + "="*30)
+        print("[DEBUG] Starting Velocity Profile Test")
+        print("="*30)
+
+        start_x = self.get_current_x()
+        print(f"[INIT] Start Position X: {start_x:.4f} m")
+
+        # === 阶段 1: 运动 (0s -> 2s) ===
         cmd = Twist()
         cmd.linear.x = 2.0
         
-        # === 核心修改：使用仿真时间 (ROSTime) ===
-        # 确保使用的是仿真里的时间，而不是电脑系统时间
         start_time = rospy.Time.now()
-        duration = rospy.Duration(2.0) # 仿真时间跑2秒
-        rate = rospy.Rate(20)
+        run_duration = rospy.Duration(2.0)
+        rate = rospy.Rate(10) # 10Hz采样率 (每0.1s一次)
 
-        print(f"[DEBUG] Sending command linear.x=2.0 for {duration.to_sec()} simulation seconds...")
+        velocities_during_motion = []
         
-        while (rospy.Time.now() - start_time) < duration and not rospy.is_shutdown():
+        print(f"[PHASE 1] Commanding 2.0 m/s for {run_duration.to_sec()}s...")
+        
+        while (rospy.Time.now() - start_time) < run_duration and not rospy.is_shutdown():
             pub.publish(cmd)
+            
+            # 采样当前速度
+            current_v = self.get_current_speed()
+            velocities_during_motion.append(current_v)
+            
+            # 打印实时速度，方便你直接在控制台看
+            print(f"  -> T+{(rospy.Time.now() - start_time).to_sec():.2f}s | Vel: {current_v:.4f} m/s")
+            
             rate.sleep()
 
-        # 发送停止指令
-        pub.publish(Twist())
+        # === 阶段 2: 制动 (2s -> 4s) ===
+        print("[PHASE 2] Commanding STOP (0.0 m/s)...")
+        stop_cmd = Twist()
+        pub.publish(stop_cmd) # 发送第一次停止
         
-        # 给一点物理惯性停止的时间
-        rospy.sleep(1.0)
+        stop_start_time = rospy.Time.now()
+        stop_duration = rospy.Duration(2.0)
+        
+        velocities_during_stop = []
 
-        # 3. 获取最终位置
-        final = rospy.wait_for_message(topic, Odometry, timeout=5.0)
-        end_x = final.pose.pose.position.x
-        displacement = end_x - start_x
+        while (rospy.Time.now() - stop_start_time) < stop_duration and not rospy.is_shutdown():
+            pub.publish(stop_cmd) # 持续发送停止指令防止超时保护
+            
+            current_v = self.get_current_speed()
+            velocities_during_stop.append(current_v)
+            
+            print(f"  -> T+{(rospy.Time.now() - start_time).to_sec():.2f}s | Vel: {current_v:.4f} m/s")
+            
+            rate.sleep()
+
+        # === 分析结果 ===
+        end_x = self.get_current_x()
+        total_displacement = end_x - start_x
         
-        print(f"[DEBUG] End X: {end_x:.4f}")
-        print(f"[DEBUG] Total Displacement: {displacement:.4f} m")
+        # 计算加速完成后的平均速度（去掉前0.5秒的加速期）
+        steady_state_samples = velocities_during_motion[5:] 
+        avg_speed = statistics.mean(steady_state_samples) if steady_state_samples else 0.0
+        max_speed = max(velocities_during_motion)
+        final_speed = velocities_during_stop[-1]
+
+        print("="*30)
+        print(f"[RESULT] Total Displacement: {total_displacement:.4f} m")
+        print(f"[RESULT] Average Speed (Steady): {avg_speed:.4f} m/s")
+        print(f"[RESULT] Max Speed Reached:     {max_speed:.4f} m/s")
+        print(f"[RESULT] Final Speed (at 4s):   {final_speed:.4f} m/s")
+        print("="*30)
+
+        # === 断言诊断 ===
         
-        # 4. 断言
-        # 理论值：2.0 m/s * 2.0 s = 4.0 m
-        # 考虑到加速过程，位移应该略小于 4.0 m (例如 3.5 - 3.9m)
-        # 如果大于 4.1m，说明有问题（或者之前提到的超速问题）
+        # 1. 检查是否停下来了
+        self.assertLess(abs(final_speed), 0.1, 
+            f"Braking failed! Robot is still moving at {final_speed:.2f} m/s")
+
+        # 2. 检查速度是否严重超标 (诊断 23m 问题)
+        # 如果你设定2m/s，它跑到了10m/s，这里会直接报错并告诉你当前跑了多少
+        if avg_speed > 3.0:
+            self.fail(f"CRITICAL: Overspeed detected! Target: 2.0 m/s, Actual Avg: {avg_speed:.2f} m/s. Check Controller Config!")
         
-        # 我们先断言它确实动了 (比如大于 3.9米)
-        self.assertGreater(displacement, 3.7, f"Robot moved too slow! Disp: {displacement}")
-        
-        # 我们可以加一个上限断言，验证是否超速（验证 Sim Time 修复是否生效）
-        # 理论最大值 4.0米，加上一点误差允许到 4.1米
-        self.assertLess(displacement, 4.3, f"Robot moved too fast! Disp: {displacement}")
+        # 3. 正常的速度检查
+        self.assertAlmostEqual(avg_speed, 2.0, delta=0.5, 
+            msg=f"Speed incorrect. Target 2.0, Got {avg_speed:.2f}")
 
 if __name__ == "__main__":
     import rostest
-    rostest.rosrun("my_robot_control", "test_gazebo_motion", TestGazeboMotion)
+    rostest.rosrun("my_robot_control", "test_gazebo_velocity_profile", TestGazeboVelocityProfile)

@@ -8,6 +8,14 @@ from geometry_msgs.msg import Twist
 from std_msgs.msg import Float64
 
 
+# 订阅轮速指令：监听左右后轮速度控制器的命令话题（rear_left_velocity_controller/command 和 rear_right_velocity_controller/command）
+# 发送 cmd_vel：发布一个 Twist 消息（线速度 1.5 m/s，角速度 0 rad/s）
+# 验证转换逻辑：
+# 从参数服务器读取车轮半径（默认 0.3 m）
+# 计算期望的轮速：期望速度 = 线速度 / 车轮半径 = 1.5 / 0.3 = 5.0 rad/s
+# 检查左右轮是否都接收到约 5.0 rad/s 的角速度指令
+# 断言结果：左右轮速与期望值误差在 0.5 rad/s 内则通过
+
 class TestAckermannDriverLogic(unittest.TestCase):
     """Validates that the driver publishes correct wheel commands for cmd_vel."""
 

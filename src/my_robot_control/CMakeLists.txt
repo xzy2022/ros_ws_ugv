@@ -168,6 +168,7 @@ if(CATKIN_ENABLE_TESTING)
   catkin_add_nosetests(tests)
   add_rostest(tests/driver_logic.test)
   add_rostest(tests/gazebo_sim.test)
+  add_rostest(tests/wheel_response.test)
 endif()
 
 ## Mark executables for installation

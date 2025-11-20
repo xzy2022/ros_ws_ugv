@@ -88,6 +88,7 @@ class LocalPlannerNode:
 def main():
     try:
         LocalPlannerNode()
+        rospy.spin()
     except rospy.ROSInterruptException:
         pass
 

@@ -48,3 +48,19 @@ Gazebo 仿真成功启动
 ✅ 机器人模型成功生成
 ✅ 基础控制器加载正常
 ❌ 转向控制器完全失效​ - 这是测试失败的根本原因
+
+-----------------------
+
+将前轮驱动接口从EffortJointInterface更换为PositionJointInterface，同样不设置PID参数。发现前轮转向仍然有误差，这可能是摩擦力过大导致的。
+
+log file: /home/xzy/.ros/log/29a88760-c5fc-11f0-8083-63e1feedc359/urdf_spawner-2*.log
+[INFO] [1763634731.086509, 2.240000]: Rear target 0.00 | actual L 0.000 R 0.000 | max_err 0.0000
+[INFO] [1763634732.091954, 3.241000]: Rear target 5.00 | actual L 5.000 R 5.000 | max_err 0.0000
+[INFO] [1763634733.097750, 4.242000]: Rear target 10.00 | actual L 10.000 R 10.000 | max_err 0.0000
+[INFO] [1763634734.103574, 5.243000]: Rear target -5.00 | actual L -5.000 R -5.000 | max_err 0.0001
+ok
+test_steering_response_effort (__main__.TestWheelResponse) ... [INFO] [1763634737.226158, 8.347000]: Steer target 0.000 | actual L -0.000 R -0.000 | max_err 0.0000
+[INFO] [1763634739.239118, 10.348000]: Steer target 0.300 | actual L 0.300 R 0.301 | max_err 0.0007
+[INFO] [1763634741.249301, 12.350000]: Steer target -0.300 | actual L -0.299 R -0.300 | max_err 0.0010
+[INFO] [1763634743.259600, 14.351000]: Steer target 0.500 | actual L 0.500 R 0.502 | max_err 0.0023
+ok

@@ -107,10 +107,10 @@ class TestWheelResponse(unittest.TestCase):
         joint_r = "rear_right_wheel_joint"
 
         test_cases = [
-            (0.0, 0.02, 1.0),
-            (5.0, 0.05, 1.0),
-            (10.0, 0.05, 1.0),
-            (-5.0, 0.05, 1.0),
+            (0.0, 0.001, 1.0),
+            (5.0, 0.001, 1.0),
+            (10.0, 0.001, 1.0),
+            (-5.0, 0.001, 1.0),
         ]
 
         for target_vel, tolerance, wait_time in test_cases:

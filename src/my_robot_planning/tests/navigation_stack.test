@@ -1,0 +1,17 @@
+<launch>
+    <!-- 1. 启动 Global Path Loader -->
+    <node pkg="my_robot_planning" type="global_path_loader.py" name="global_loader" output="screen">
+        <param name="csv_path" value="$(find my_robot_planning)/tests/data/test_path.csv"/>
+        <param name="velocity_kmph" value="10.0"/>
+        <param name="max_decel" value="1.0"/>
+    </node>
+
+    <!-- 2. 启动 Local Planner -->
+    <node pkg="my_robot_planning" type="local_path_planner.py" name="local_planner" output="screen">
+        <param name="lookahead_wps" value="5"/> <!-- 设置为5，方便测试脚本断言 -->
+        <param name="frequency" value="10.0"/>
+    </node>
+
+    <!-- 3. 启动测试脚本 -->
+    <test test-name="test_navigation_stack" pkg="my_robot_planning" type="test_navigation_stack.py" time-limit="30.0"/>
+</launch>

@@ -1,0 +1,13 @@
+<launch>
+    <node pkg="tf2_ros" type="static_transform_publisher" name="virtual_tf"
+          args="0 0 0 0 0 0 map base_footprint" />
+
+    <node pkg="my_robot_tracker" type="pure_pursuit_node.py" name="pure_pursuit_node" output="screen">
+        <param name="wheelbase" value="1.0" />
+        <param name="lookahead_distance" value="0.5" />
+        <param name="map_frame" value="map" />
+        <param name="base_frame" value="base_footprint" />
+    </node>
+
+    <test test-name="integration_test_pp" pkg="my_robot_tracker" type="test_pure_pursuit_node.py" />
+</launch>

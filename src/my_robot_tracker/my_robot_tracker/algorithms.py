@@ -3,7 +3,7 @@
 import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Iterable, Optional, Sequence, Tuple
+from typing import Iterable, Optional, Sequence, Tuple, Union
 
 
 @dataclass
@@ -71,17 +71,37 @@ class PurePursuit(LateralController):
         self.k = ld_gain
         self.min_ld = min_ld
 
-    def compute(self, state: VehicleState, path: Sequence[PathPoint]) -> float:
+    def compute(
+        self,
+        state: Optional[VehicleState] = None,
+        path: Optional[Sequence[PathPoint]] = None,
+        *,
+        v_target: Optional[float] = None,
+        lateral_error: Optional[float] = None,
+        lookahead_dist: Optional[float] = None,
+    ) -> Union[float, TrackerOutput]:
+        result_type: Union[float, TrackerOutput]
+        """
+        Dual-use compute:
+        - Legacy signature: compute(state, path) -> steering angle
+        - PPT signature: compute(v_target=?, lateral_error=?, lookahead_dist=?)
+          -> TrackerOutput (delta, omega)
+        """
+        # PPT-style direct computation branch
+        if v_target is not None and lateral_error is not None and lookahead_dist is not None:
+            return self.compute_command(v_target, lateral_error, lookahead_dist)
+
+        # Legacy branch: state + path -> steering
         if not path:
             return 0.0
 
-        lookahead_dist = max(self.min_ld, self.k * max(state.velocity, 0.0))
-        target = _find_lookahead_point(path, lookahead_dist)
+        lookahead = max(self.min_ld, self.k * max(state.velocity, 0.0) if state else self.min_ld)
+        target = _find_lookahead_point(path, lookahead)
         if target is None:
             return 0.0
 
         alpha = math.atan2(target.y, target.x)
-        delta = math.atan2(2.0 * self.L * math.sin(alpha), lookahead_dist)
+        delta = math.atan2(2.0 * self.L * math.sin(alpha), lookahead)
         return _normalize_angle(delta)
 
     # === Convenience API matching PPT签名 (基于横向误差与预瞄距离) ===

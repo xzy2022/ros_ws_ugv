@@ -1,0 +1,15 @@
+<launch>
+    <arg name="robot_name" default="smart" />
+
+    <include file="$(find my_robot_bringup)/launch/sim_env.launch">
+        <arg name="robot_name" value="$(arg robot_name)" />
+        <arg name="start_gazebo" value="true" />
+        <arg name="start_rviz" value="false" />
+        <arg name="use_sim_time" value="true" />
+    </include>
+
+    <test test-name="test_gazebo_motion"
+          pkg="my_robot_control"
+          type="test_gazebo_motion.py"
+          time-limit="120.0" />
+</launch>

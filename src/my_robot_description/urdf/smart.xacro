@@ -423,7 +423,7 @@
             <alwaysOn>true</alwaysOn>
             <updateRate>50.0</updateRate>
             <bodyName>base_link</bodyName>
-            <topicName>ground_truth/state</topicName>
+            <topicName>/$(arg roboname)/ground_truth/state</topicName>
             <gaussianNoise>0.0</gaussianNoise>
             <frameName>world</frameName>
             <xyzOffsets>0 0 0</xyzOffsets>

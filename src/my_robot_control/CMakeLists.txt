@@ -164,7 +164,10 @@ catkin_install_python(PROGRAMS
 )
 
 if(CATKIN_ENABLE_TESTING)
+  find_package(rostest REQUIRED)
   catkin_add_nosetests(tests)
+  add_rostest(tests/driver_logic.test)
+  add_rostest(tests/gazebo_sim.test)
 endif()
 
 ## Mark executables for installation

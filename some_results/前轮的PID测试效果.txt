@@ -1,0 +1,50 @@
+--------------------------------------------------------
+前轮设置PID
+
+测试运行完成，但有一个测试失败。
+测试概况：
+总测试数：2
+通过：1
+失败：1
+错误：0
+详细结果：
+✅ test_rear_velocity_response_god_mode​ - 通过
+后轮速度响应测试正常
+❌ test_steering_response_effort​ - 失败
+失败原因：左侧转向误差 0.106 超过了容差 0.1
+具体数值：实际误差 0.105948 > 允许容差 0.1
+失败位置：/home/xzy/self-driving-my/ros_ws/src/my_robot_control/tests/test_wheel_response.py第102行
+测试环境信息：
+Gazebo 仿真成功启动
+控制器加载正常（关节状态控制器、后轮速度控制器、转向位置控制器）
+机器人模型成功生成
+但出现PID参数警告：后轮关节缺少P增益参数
+
+-----------------------------------------------------------
+前轮注释掉PID，直接车子不动了
+
+测试运行完成，但两个测试都失败了。
+测试概况：
+总测试数：2
+通过：0
+失败：2
+错误：0
+详细结果：
+❌ test_rear_velocity_response_god_mode​ - 失败
+失败原因：左后轮速度误差 5.000 超过了容差 0.05
+具体数值：实际误差 4.99996 > 允许容差 0.05
+失败位置：test_wheel_response.py第138行
+❌ test_steering_response_effort​ - 失败
+失败原因：左侧转向误差 0.300 超过了容差 0.05
+具体数值：实际误差 0.2996 > 允许容差 0.05
+失败位置：test_wheel_response.py第102行
+关键问题：
+测试环境出现严重配置错误：
+两个转向位置控制器（front_right_steering_position_controller和 front_left_steering_position_controller）完全加载失败
+错误信息：No p gain specified for pid- 缺少PID控制器的P增益参数
+最终只成功加载了3个控制器：关节状态控制器和两个后轮速度控制器
+系统状态：
+✅ Gazebo仿真正常启动
+✅ 机器人模型成功生成
+✅ 基础控制器加载正常
+❌ 转向控制器完全失效​ - 这是测试失败的根本原因

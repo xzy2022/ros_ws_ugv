@@ -11,22 +11,24 @@ class AckermannDriverNode:
     def __init__(self):
         rospy.init_node('ackermann_driver', anonymous=False)
 
-        # 1. 从参数服务器加载车辆物理参数 (在 global_params.yaml 中定义)
-        # 这样你修改车的大小不用改代码
-        wheelbase = rospy.get_param("~wheelbase", 0.3)    # L
-        track_width = rospy.get_param("~track_width", 0.2) # W
-        wheel_radius = rospy.get_param("~wheel_radius", 0.05)
-        
-        # 2. 获取控制器的话题名称前缀
-        # 假设你在 yaml 里定义了控制器的名字，比如 rear_left_velocity_controller
-        controller_ns = rospy.get_param("~controller_namespace", "") # e.g., "smart"
-        
-        # 3. 初始化你的纯逻辑算法库
+        robot_ns = rospy.get_namespace()
+        if not robot_ns.endswith('/'):
+            robot_ns += '/'
+
+        # 1. 从参数服务器加载车辆物理参数 (优先节点私有参数，其次机器人命名空间内的全局 YAML)
+        wheelbase = rospy.get_param("~wheelbase",
+                                    rospy.get_param(f"{robot_ns}vehicle_physics/wheelbase", 0.3))
+        track_width = rospy.get_param("~track_width",
+                                      rospy.get_param(f"{robot_ns}vehicle_physics/track_width", 0.2))
+        wheel_radius = rospy.get_param("~wheel_radius",
+                                       rospy.get_param(f"{robot_ns}vehicle_physics/wheel_radius", 0.05))
+
+        # 2. 初始化你的纯逻辑算法库
         self.kinematics = AckermannKinematics(
             wheelbase=wheelbase,
             track_width=track_width,
             front_wheel_radius=wheel_radius,
-            rear_wheel_radius=wheel_radius, # 假设前后轮半径相同
+            rear_wheel_radius=wheel_radius,  # 假设前后轮半径相同
             model_type=SteeringModel.ACKERMANN
         )
 
@@ -43,14 +45,18 @@ class AckermannDriverNode:
             'rear_right_velocity_controller/command', Float64, queue_size=1)
 
         # 5. 订阅 cmd_vel
-        cmd_topic = rospy.get_param("~cmd_vel_topic", "/cmd_vel")
+        cmd_topic = rospy.get_param("~cmd_vel_topic",
+                                    rospy.get_param(f"{robot_ns}topics/cmd_vel", "cmd_vel"))
         self.sub_cmd = rospy.Subscriber(cmd_topic, Twist, self.cmd_callback, queue_size=1)
 
         # [可选] 安全看门狗：如果一段时间没收到 cmd_vel，就停车
         self.last_cmd_time = rospy.Time.now()
         rospy.Timer(rospy.Duration(0.1), self.watchdog_callback)
         
-        rospy.loginfo(f"Ackermann Driver Started. L={wheelbase}, W={track_width}")
+        rospy.loginfo(
+            "Ackermann Driver Started (ns=%s). L=%.3f W=%.3f wheel_radius=%.3f, cmd_topic=%s",
+            robot_ns, wheelbase, track_width, wheel_radius, self.sub_cmd.resolved_name
+        )
 
     def cmd_callback(self, msg: Twist):
         """收到速度指令，调用算法库进行解算"""

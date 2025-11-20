@@ -20,6 +20,6 @@ visualization:
 
 # 物理参数 (供 Driver 读取)
 vehicle_physics:
-  wheelbase: 0.335  # 你的车轴距
-  track_width: 0.25 # 你的车轮距
-  wheel_radius: 0.05
+  wheelbase: 1.868  # Derived from rear/front joint offsets in smart.xacro
+  track_width: 1.284 # Twice the lateral tyre offset
+  wheel_radius: 0.3

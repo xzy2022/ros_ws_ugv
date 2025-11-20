@@ -114,6 +114,57 @@ class TestNavigationStack(unittest.TestCase):
         last_local_x = self.local_lane.waypoints[-1].pose.pose.position.x
         self.assertAlmostEqual(last_local_x, 7.0, delta=0.1)
 
+    def test_3_end_of_path_behavior(self):
+        """测试终点附近剩余点数不足 lookahead 时的行为"""
+        if self.global_lane is None:
+            rospy.wait_for_message("/base_waypoints", Lane, timeout=5.0)
+
+        odom = Odometry()
+        odom.header.frame_id = "world"
+        odom.pose.pose.position.x = 9.8  # 接近终点 x=10.0
+        odom.pose.pose.position.y = 0.0
+
+        self.local_lane = None
+        for _ in range(10):
+            self.odom_pub.publish(odom)
+            rospy.sleep(0.1)
+            if self.local_lane is not None:
+                break
+
+        self.assertIsNotNone(self.local_lane, "Planner failed near end of path")
+
+        count = len(self.local_lane.waypoints)
+        self.assertTrue(0 < count <= 5, f"Expected 1-5 points near end, got {count}")
+
+        last_x = self.local_lane.waypoints[-1].pose.pose.position.x
+        self.assertAlmostEqual(last_x, 10.0, delta=0.05)
+
+    def test_4_timestamp_and_frame_id_check(self):
+        """测试局部规划器输出的时间戳新鲜且坐标系匹配"""
+        odom = Odometry()
+        odom.header.frame_id = "world"
+        odom.header.stamp = rospy.Time.now()
+        odom.pose.pose.position.x = 5.0
+        odom.pose.pose.position.y = 0.0
+
+        self.local_lane = None
+        start = time.time()
+        while time.time() - start < 2.0:
+            self.odom_pub.publish(odom)
+            rospy.sleep(0.1)
+            if self.local_lane is not None:
+                break
+
+        self.assertIsNotNone(self.local_lane, "Local planner did not publish for timestamp check")
+
+        diff = (rospy.Time.now() - self.local_lane.header.stamp).to_sec()
+        self.assertLess(diff, 0.5, f"Planner is publishing stale data (age={diff:.3f}s)")
+        self.assertEqual(
+            self.local_lane.header.frame_id,
+            odom.header.frame_id,
+            "Frame ID mismatch between odometry and local path",
+        )
+
 
 if __name__ == "__main__":
     import rostest

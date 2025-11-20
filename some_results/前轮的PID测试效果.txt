@@ -64,3 +64,18 @@ test_steering_response_effort (__main__.TestWheelResponse) ... [INFO] [176363473
 [INFO] [1763634741.249301, 12.350000]: Steer target -0.300 | actual L -0.299 R -0.300 | max_err 0.0010
 [INFO] [1763634743.259600, 14.351000]: Steer target 0.500 | actual L 0.500 R 0.502 | max_err 0.0023
 ok
+
+----------------------------------
+四个车轮的<gazebo reference=...wheel_link>模块现统一采用mu1=1.0和mu2=1.0参数。修改摩擦系数后，的确前轮转角误差减小。
+
+log file: /home/xzy/.ros/log/c127ddc4-c5fd-11f0-8083-63e1feedc359/urdf_spawner-2*.log
+[INFO] [1763635414.772861, 2.446000]: Rear target 0.00 | actual L 0.000 R 0.000 | max_err 0.0000
+[INFO] [1763635415.778521, 3.447000]: Rear target 5.00 | actual L 5.000 R 5.000 | max_err 0.0000
+[INFO] [1763635416.784759, 4.449000]: Rear target 10.00 | actual L 10.000 R 10.000 | max_err 0.0000
+[INFO] [1763635417.790630, 5.450000]: Rear target -5.00 | actual L -5.001 R -5.001 | max_err 0.0009
+ok
+test_steering_response_effort (__main__.TestWheelResponse) ... [INFO] [1763635420.906397, 8.552000]: Steer target 0.000 | actual L 0.000 R -0.000 | max_err 0.0000
+[INFO] [1763635422.917237, 10.554000]: Steer target 0.300 | actual L 0.300 R 0.300 | max_err 0.0002
+[INFO] [1763635424.928398, 12.556000]: Steer target -0.300 | actual L -0.300 R -0.300 | max_err 0.0002
+[INFO] [1763635426.939330, 14.558000]: Steer target 0.500 | actual L 0.500 R 0.500 | max_err 0.0000
+ok

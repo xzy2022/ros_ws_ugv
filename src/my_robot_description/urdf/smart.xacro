@@ -369,29 +369,29 @@
     <!-- Friction Parametres -->
 
     <gazebo reference="rear_right_wheel_link">
-        <mu1>10000000</mu1>
-        <mu2>10000000</mu2>
+        <mu1>1.0</mu1>
+        <mu2>1.0</mu2>
         <kp>10000000</kp>
         <kd>1</kd>
     </gazebo>
 
     <gazebo reference="rear_left_wheel_link">
-        <mu1>10000000</mu1>
-        <mu2>10000000</mu2>
+        <mu1>1.0</mu1>
+        <mu2>1.0</mu2>
         <kp>10000000</kp>
         <kd>1</kd>
     </gazebo>
 
     <gazebo reference="front_right_wheel_link">
-        <mu1>10000000</mu1>
-        <mu2>10000000</mu2>
+        <mu1>1.0</mu1>
+        <mu2>1.0</mu2>
         <kp>10000000</kp>
         <kd>1</kd>
     </gazebo>
 
     <gazebo reference="front_left_wheel_link">
-        <mu1>10000000</mu1>
-        <mu2>10000000</mu2>
+        <mu1>1.0</mu1>
+        <mu2>1.0</mu2>
         <kp>10000000</kp>
         <kd>1</kd>
     </gazebo>

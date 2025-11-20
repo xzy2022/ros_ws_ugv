@@ -1,0 +1,96 @@
+0-5s 2m/s 6-8s 0m/s 的测试结果
+注释掉结尾的pid
+src/my_robot_control/config/gazebo_controllers.yaml
+==============================
+[DEBUG] Starting Velocity Profile Test
+==============================
+[INIT] Start Position X: 0.0001 m
+[PHASE 1] Commanding 5.0 m/s for 5.0s...
+  -> T+0.00s | Vel: -0.0000 m/s
+  -> T+0.10s | Vel: 2.0000 m/s
+  -> T+0.20s | Vel: 2.0000 m/s
+  -> T+0.30s | Vel: 2.0000 m/s
+  -> T+0.40s | Vel: 2.0000 m/s
+  -> T+0.50s | Vel: 2.0000 m/s
+  -> T+0.60s | Vel: 2.0000 m/s
+  -> T+0.70s | Vel: 2.0000 m/s
+  -> T+0.80s | Vel: 2.0000 m/s
+  -> T+0.90s | Vel: 2.0000 m/s
+  -> T+1.00s | Vel: 2.0000 m/s
+  -> T+1.10s | Vel: 2.0000 m/s
+  -> T+1.20s | Vel: 2.0000 m/s
+  -> T+1.30s | Vel: 2.0000 m/s
+  -> T+1.40s | Vel: 2.0000 m/s
+  -> T+1.50s | Vel: 2.0000 m/s
+  -> T+1.60s | Vel: 2.0000 m/s
+  -> T+1.70s | Vel: 2.0000 m/s
+  -> T+1.80s | Vel: 2.0000 m/s
+  -> T+1.90s | Vel: 2.0000 m/s
+  -> T+2.00s | Vel: 2.0000 m/s
+  -> T+2.10s | Vel: 2.0000 m/s
+  -> T+2.20s | Vel: 2.0000 m/s
+  -> T+2.30s | Vel: 2.0000 m/s
+  -> T+2.40s | Vel: 2.0000 m/s
+  -> T+2.50s | Vel: 2.0000 m/s
+  -> T+2.60s | Vel: 2.0000 m/s
+  -> T+2.70s | Vel: 2.0000 m/s
+  -> T+2.80s | Vel: 2.0000 m/s
+  -> T+2.90s | Vel: 2.0000 m/s
+  -> T+3.00s | Vel: 2.0000 m/s
+  -> T+3.10s | Vel: 2.0000 m/s
+  -> T+3.20s | Vel: 2.0000 m/s
+  -> T+3.30s | Vel: 2.0000 m/s
+  -> T+3.40s | Vel: 2.0000 m/s
+  -> T+3.50s | Vel: 2.0000 m/s
+  -> T+3.60s | Vel: 2.0000 m/s
+  -> T+3.70s | Vel: 2.0000 m/s
+  -> T+3.80s | Vel: 2.0000 m/s
+  -> T+3.90s | Vel: 2.0000 m/s
+  -> T+4.00s | Vel: 2.0000 m/s
+  -> T+4.10s | Vel: 2.0000 m/s
+  -> T+4.20s | Vel: 2.0000 m/s
+  -> T+4.30s | Vel: 2.0000 m/s
+  -> T+4.40s | Vel: 2.0000 m/s
+  -> T+4.50s | Vel: 2.0000 m/s
+  -> T+4.60s | Vel: 2.0000 m/s
+  -> T+4.70s | Vel: 2.0000 m/s
+  -> T+4.80s | Vel: 2.0000 m/s
+  -> T+4.90s | Vel: 2.0000 m/s
+[PHASE 2] Commanding STOP (0.0 m/s)...
+  -> T+5.00s | Vel: 2.0000 m/s
+  -> T+5.10s | Vel: -0.0000 m/s
+  -> T+5.20s | Vel: -0.0000 m/s
+  -> T+5.30s | Vel: -0.0000 m/s
+  -> T+5.40s | Vel: -0.0000 m/s
+  -> T+5.50s | Vel: -0.0000 m/s
+  -> T+5.60s | Vel: -0.0000 m/s
+  -> T+5.70s | Vel: -0.0000 m/s
+  -> T+5.80s | Vel: -0.0000 m/s
+  -> T+5.90s | Vel: -0.0000 m/s
+  -> T+6.00s | Vel: -0.0000 m/s
+  -> T+6.10s | Vel: -0.0000 m/s
+  -> T+6.20s | Vel: -0.0000 m/s
+  -> T+6.30s | Vel: -0.0000 m/s
+  -> T+6.40s | Vel: -0.0000 m/s
+  -> T+6.50s | Vel: -0.0000 m/s
+  -> T+6.60s | Vel: -0.0000 m/s
+  -> T+6.70s | Vel: -0.0000 m/s
+  -> T+6.80s | Vel: -0.0000 m/s
+  -> T+6.90s | Vel: -0.0000 m/s
+  -> T+7.00s | Vel: -0.0000 m/s
+  -> T+7.10s | Vel: -0.0000 m/s
+  -> T+7.20s | Vel: -0.0000 m/s
+  -> T+7.30s | Vel: -0.0000 m/s
+  -> T+7.40s | Vel: -0.0000 m/s
+  -> T+7.50s | Vel: -0.0000 m/s
+  -> T+7.60s | Vel: -0.0000 m/s
+  -> T+7.70s | Vel: -0.0000 m/s
+  -> T+7.80s | Vel: -0.0000 m/s
+  -> T+7.90s | Vel: -0.0000 m/s
+==============================
+[RESULT] Total Displacement: 10.0053 m
+[RESULT] Average Speed (Steady): 2.0000 m/s
+[RESULT] Max Speed Reached:     2.0000 m/s
+[RESULT] Final Speed (at 4s):   -0.0000 m/s
+==============================
+ok

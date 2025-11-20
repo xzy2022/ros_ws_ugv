@@ -6,6 +6,11 @@ import rospy
 from sensor_msgs.msg import JointState
 from std_msgs.msg import Float64
 
+"""
+    测试四个轮子的控制响应性能，包括前轮的转向位置控制和后轮的速度控制。
+    从而分析是否要为前轮增加控制器PID，或者使用什么控制器
+
+"""
 
 class JointStateMonitor:
     """Tracks latest joint positions and velocities for assertions."""

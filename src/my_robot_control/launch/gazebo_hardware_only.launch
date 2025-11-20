@@ -1,0 +1,36 @@
+<launch>
+    <arg name="robot_name" default="smart" />
+
+    <!-- 1. Gazebo headless empty world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="false"/>
+        <arg name="headless" value="true"/>
+    </include>
+
+    <!-- 2. Load robot description -->
+    <param name="robot_description" command="$(find xacro)/xacro '$(find my_robot_description)/urdf/smart.xacro' roboname:='$(arg robot_name)'" />
+
+    <!-- 3. Spawn model -->
+    <node name="urdf_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+          args="-urdf -model $(arg robot_name) -param robot_description -z 0.05"/>
+
+    <!-- 4. Load controllers -->
+    <rosparam file="$(find my_robot_control)/config/gazebo_controllers.yaml" command="load" ns="$(arg robot_name)" />
+
+    <!-- 5. Start controller spawner (no higher-level drivers) -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+          output="screen" ns="/$(arg robot_name)"
+          args="joint_state_controller 
+                rear_right_velocity_controller 
+                rear_left_velocity_controller 
+                front_right_steering_position_controller 
+                front_left_steering_position_controller"/>
+
+    <!-- 6. Publish robot state -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" ns="/$(arg robot_name)">
+        <param name="publish_frequency" value="50.0"/>
+        <remap from="/joint_states" to="/$(arg robot_name)/joint_states" />
+    </node>
+</launch>

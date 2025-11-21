@@ -14,6 +14,9 @@ topics:
   cmd_vel: cmd_vel
   odom: odom
   ground_truth: ground_truth/state
+  base_waypoints: base_waypoints
+  final_waypoints: final_waypoints
+  final_path: final_path
 
 visualization:
   frame_id: world

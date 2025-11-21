@@ -11,6 +11,7 @@
 
     <!-- Load shared parameters once -->
     <rosparam command="load" file="$(find my_robot_bringup)/config/global_params.yaml" ns="$(arg robot_name)" />
+    <param name="robot_name" value="$(arg robot_name)" />
     <param name="use_sim_time" value="$(arg use_sim_time)" />
 
     <!-- Upload robot description for downstream nodes -->

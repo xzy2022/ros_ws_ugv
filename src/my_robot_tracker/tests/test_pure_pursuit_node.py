@@ -11,8 +11,8 @@ class TestPurePursuitNode(unittest.TestCase):
     def setUp(self):
         rospy.init_node("test_pp_node_client")
         self.received_cmd = None
-        self.path_pub = rospy.Publisher("/final_waypoints", Lane, queue_size=1, latch=True)
-        rospy.Subscriber("/cmd_vel", Twist, self.cmd_cb)
+        self.path_pub = rospy.Publisher("final_waypoints", Lane, queue_size=1, latch=True)
+        rospy.Subscriber("cmd_vel", Twist, self.cmd_cb)
 
     def cmd_cb(self, msg):
         self.received_cmd = msg

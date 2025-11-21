@@ -13,24 +13,26 @@ class PurePursuitNode:
     def __init__(self):
         rospy.init_node("pure_pursuit_node")
 
-        # Parameters
-        robot_ns = rospy.get_namespace()
-        if not robot_ns.endswith("/"):
-            robot_ns += "/"
+        # Parameter context
+        self.robot_ns = self._detect_robot_ns()
 
-        self.wheelbase = rospy.get_param("~wheelbase", 0.335)
-        self.lookahead_dist = rospy.get_param("~lookahead_distance", 1.0)
-        self.map_frame = rospy.get_param("~map_frame", "world")
-        self.base_frame = rospy.get_param("~base_frame", "base_link")
-        self.path_topic = rospy.get_param(
-            "~path_topic", rospy.get_param(f"{robot_ns}topics/final_waypoints", "final_waypoints")
+        # Parameters: private -> global (robot_ns) -> default
+        self.wheelbase = self._get_param_with_fallback(
+            "wheelbase",
+            self._get_param_with_fallback("vehicle_physics/wheelbase", 0.335),
         )
-        self.cmd_vel_topic = rospy.get_param(
-            "~cmd_vel_topic", rospy.get_param(f"{robot_ns}topics/cmd_vel", "cmd_vel")
-        )
+        self.lookahead_dist = self._get_param_with_fallback("lookahead_distance", 1.0)
+        self.min_lookahead = self._get_param_with_fallback("min_lookahead_distance", self.lookahead_dist)
+        self.ld_gain = self._get_param_with_fallback("lookahead_gain", 0.0)
+        self.map_frame = self._get_param_with_fallback("map_frame", "world")
+        self.base_frame = self._get_param_with_fallback("base_frame", "base_link")
+
+        # Topic resolution via central dictionary
+        self.path_topic = self._resolve_topic("final_waypoints", "final_waypoints")
+        self.cmd_vel_topic = self._resolve_topic("cmd_vel", "cmd_vel")
 
         # Controller
-        self.controller = PurePursuit(wheelbase=self.wheelbase, ld_gain=0.0, min_ld=self.lookahead_dist)
+        self.controller = PurePursuit(wheelbase=self.wheelbase, ld_gain=self.ld_gain, min_ld=self.min_lookahead)
 
         # TF
         self.tf_buffer = tf2_ros.Buffer()
@@ -107,11 +109,43 @@ class PurePursuitNode:
         cmd = Twist()
         cmd.linear.x = target_v
         cmd.angular.z = output.angular_velocity
-        print(f"Publishing cmd: linear_x={cmd.linear.x:.2f}, angular_z={cmd.angular.z:.2f}")
+        rospy.logdebug("Publishing cmd to %s: linear_x=%.2f angular_z=%.2f", self.cmd_vel_topic, cmd.linear.x, cmd.angular.z)
         self.cmd_pub.publish(cmd)
 
     def publish_stop(self):
         self.cmd_pub.publish(Twist())
+
+    def _detect_robot_ns(self) -> str:
+        """Pick robot namespace from node ns or common params."""
+        ns = rospy.get_namespace().strip("/")
+        if ns:
+            return ns
+        return rospy.get_param("~robot_name", rospy.get_param("robot_name", ""))
+
+    def _get_param_with_fallback(self, name: str, default):
+        """Resolve parameter with priority: private -> robot namespace -> global -> default."""
+        private_name = "~" + name
+        if rospy.has_param(private_name):
+            return rospy.get_param(private_name)
+
+        candidate_keys = []
+        if self.robot_ns:
+            candidate_keys.append(f"/{self.robot_ns}/{name}")
+        candidate_keys.append("/" + name if not name.startswith("/") else name)
+        candidate_keys.append(name)
+
+        for key in candidate_keys:
+            if rospy.has_param(key):
+                return rospy.get_param(key)
+        return default
+
+    def _resolve_topic(self, topic_key: str, default: str) -> str:
+        """Read topic name from topics dictionary and enforce relative naming."""
+        topic_name = self._get_param_with_fallback(f"topics/{topic_key}", default)
+        if isinstance(topic_name, str) and topic_name.startswith("/"):
+            rospy.logwarn_once("Topic '%s' supplied as absolute name '%s'; stripping leading '/'.", topic_key, topic_name)
+            topic_name = topic_name.lstrip("/")
+        return topic_name
 
 
 def main():

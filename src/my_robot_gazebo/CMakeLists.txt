@@ -10,6 +10,9 @@ project(my_robot_gazebo)
 find_package(catkin REQUIRED COMPONENTS
   gazebo_ros
   my_robot_description
+  rospy
+  nav_msgs
+  tf2_ros
   xacro
 )
 
@@ -103,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  CATKIN_DEPENDS gazebo_ros my_robot_description xacro
+  CATKIN_DEPENDS gazebo_ros my_robot_description rospy nav_msgs tf2_ros xacro
 )
 
 ###########
@@ -115,6 +118,11 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+)
+
+catkin_install_python(PROGRAMS
+  nodes/ground_truth_tf_broadcaster.py
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 ## Declare a C++ library

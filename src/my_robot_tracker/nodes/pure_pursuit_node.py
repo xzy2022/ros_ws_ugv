@@ -14,10 +14,20 @@ class PurePursuitNode:
         rospy.init_node("pure_pursuit_node")
 
         # Parameters
+        robot_ns = rospy.get_namespace()
+        if not robot_ns.endswith("/"):
+            robot_ns += "/"
+
         self.wheelbase = rospy.get_param("~wheelbase", 0.335)
         self.lookahead_dist = rospy.get_param("~lookahead_distance", 1.0)
         self.map_frame = rospy.get_param("~map_frame", "world")
-        self.base_frame = rospy.get_param("~base_frame", "base_footprint")
+        self.base_frame = rospy.get_param("~base_frame", "base_link")
+        self.path_topic = rospy.get_param(
+            "~path_topic", rospy.get_param(f"{robot_ns}topics/final_waypoints", "final_waypoints")
+        )
+        self.cmd_vel_topic = rospy.get_param(
+            "~cmd_vel_topic", rospy.get_param(f"{robot_ns}topics/cmd_vel", "cmd_vel")
+        )
 
         # Controller
         self.controller = PurePursuit(wheelbase=self.wheelbase, ld_gain=0.0, min_ld=self.lookahead_dist)
@@ -27,8 +37,8 @@ class PurePursuitNode:
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
 
         # IO
-        rospy.Subscriber("/final_waypoints", Lane, self.path_callback, queue_size=1)
-        self.cmd_pub = rospy.Publisher("/cmd_vel", Twist, queue_size=1)
+        rospy.Subscriber(self.path_topic, Lane, self.path_callback, queue_size=1)
+        self.cmd_pub = rospy.Publisher(self.cmd_vel_topic, Twist, queue_size=1)
 
         self.latest_path = []  # list of tuples (x, y, v)
         self.timer = rospy.Timer(rospy.Duration(0.05), self.control_loop)  # 20 Hz
@@ -97,6 +107,7 @@ class PurePursuitNode:
         cmd = Twist()
         cmd.linear.x = target_v
         cmd.angular.z = output.angular_velocity
+        print(f"Publishing cmd: linear_x={cmd.linear.x:.2f}, angular_z={cmd.angular.z:.2f}")
         self.cmd_pub.publish(cmd)
 
     def publish_stop(self):

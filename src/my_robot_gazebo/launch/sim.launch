@@ -12,4 +12,11 @@
     <include file="$(find my_robot_gazebo)/launch/spawn_robot.launch">
         <arg name="robot_name" value="$(arg robot_name)" />
     </include>
+
+    <!-- Broadcast TF from ground truth odometry -->
+    <node pkg="my_robot_gazebo" type="ground_truth_tf_broadcaster.py" name="ground_truth_tf" output="screen">
+        <param name="odom_topic" value="/$(arg robot_name)/ground_truth/state"/>
+        <param name="parent_frame" value="world"/>
+        <param name="child_frame" value="base_link"/>
+    </node>
 </launch>

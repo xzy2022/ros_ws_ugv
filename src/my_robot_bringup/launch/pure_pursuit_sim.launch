@@ -3,7 +3,7 @@
     <!-- Reuse base sim environment -->
     <include file="$(find my_robot_bringup)/launch/sim_env.launch">
         <arg name="start_gazebo" value="true" />
-        <arg name="start_rviz" value="false" />
+        <arg name="start_rviz" value="true" />
         <arg name="paused" value="false" />
         <arg name="use_sim_time" value="true" />
     </include>

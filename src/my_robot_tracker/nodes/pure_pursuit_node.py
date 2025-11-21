@@ -29,7 +29,7 @@ class PurePursuitNode:
 
         # Topic resolution via central dictionary
         self.path_topic = self._resolve_topic("final_waypoints", "final_waypoints")
-        self.cmd_vel_topic = self._resolve_topic("cmd_vel", "cmd_vel")
+        self.cmd_vel_topic = "/smart/cmd_vel"
 
         # Controller
         self.controller = PurePursuit(wheelbase=self.wheelbase, ld_gain=self.ld_gain, min_ld=self.min_lookahead)
@@ -109,7 +109,6 @@ class PurePursuitNode:
         cmd = Twist()
         cmd.linear.x = target_v
         cmd.angular.z = output.angular_velocity
-        rospy.logdebug("Publishing cmd to %s: linear_x=%.2f angular_z=%.2f", self.cmd_vel_topic, cmd.linear.x, cmd.angular.z)
         self.cmd_pub.publish(cmd)
 
     def publish_stop(self):

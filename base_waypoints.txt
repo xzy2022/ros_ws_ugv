@@ -1,0 +1,1968 @@
+header: 
+  seq: 2
+  stamp: 
+    secs: 0
+    nsecs:         0
+  frame_id: "world"
+waypoints: 
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 1.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 2.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 3.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 4.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 5.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 6.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 7.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 8.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 9.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 10.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 11.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 12.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 13.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 14.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 15.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 16.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 17.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 18.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 19.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 20.0
+          y: 0.0
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+          w: 1.0
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 21.0
+          y: 0.05
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.04997916927067833
+          w: 0.9987502603949663
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 21.99
+          y: 0.2
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.09983341664682815
+          w: 0.9950041652780258
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 22.96
+          y: 0.45
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.14943813247359922
+          w: 0.9887710779360422
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 23.89
+          y: 0.79
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.19866933079506122
+          w: 0.9800665778412416
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 24.79
+          y: 1.22
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.24740395925452294
+          w: 0.9689124217106447
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 25.65
+          y: 1.75
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.29552020666133955
+          w: 0.955336489125606
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 26.44
+          y: 2.35
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.34289780745545134
+          w: 0.9393727128473789
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 27.17
+          y: 3.03
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.3894183423086505
+          w: 0.9210609940028851
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 27.83
+          y: 3.78
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.43496553411123023
+          w: 0.9004471023526769
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 28.41
+          y: 4.6
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.479425538604203
+          w: 0.8775825618903728
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 28.91
+          y: 5.46
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.5226872289306592
+          w: 0.8525245220595057
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 29.32
+          y: 6.38
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.5646424733950354
+          w: 0.8253356149096783
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 29.64
+          y: 7.33
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6051864057360395
+          w: 0.7960837985490559
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 29.85
+          y: 8.3
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.644217687237691
+          w: 0.7648421872844885
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 29.97
+          y: 9.29
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.05
+          y: 10.29
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.12
+          y: 11.29
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.19
+          y: 12.29
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.26
+          y: 13.28
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.33
+          y: 14.28
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.4
+          y: 15.28
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.47
+          y: 16.28
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.54
+          y: 17.27
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.61
+          y: 18.27
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.68
+          y: 19.27
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.75
+          y: 20.27
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.82
+          y: 21.26
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.89
+          y: 22.26
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 30.97
+          y: 23.26
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 31.04
+          y: 24.26
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 31.11
+          y: 25.25
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.7777777777777777
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 31.18
+          y: 26.25
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 2.4484140475929315
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 31.25
+          y: 27.25
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 1.9974577182731954
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 31.32
+          y: 28.25
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 1.40888016670259
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+  - 
+    pose: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      pose: 
+        position: 
+          x: 31.39
+          y: 29.24
+          z: 0.0
+        orientation: 
+          x: 0.0
+          y: 0.0
+          z: 0.6816387600233341
+          w: 0.7316888688738209
+    twist: 
+      header: 
+        seq: 2
+        stamp: 
+          secs: 0
+          nsecs:         0
+        frame_id: "world"
+      twist: 
+        linear: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+        angular: 
+          x: 0.0
+          y: 0.0
+          z: 0.0
+    forward: True
+---

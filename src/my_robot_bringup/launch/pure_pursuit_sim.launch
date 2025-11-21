@@ -21,6 +21,12 @@
         <param name="frequency" value="10.0"/>
     </node>
 
+    <!-- Ground-truth pose logger -->
+    <node pkg="my_robot_logger" type="ground_truth_logger.py" name="ground_truth_logger" output="screen">
+        <param name="output_dir" value="/home/xzy/self-driving-my/ros_ws/logs" />
+        <param name="use_robot_namespace" value="true" />
+    </node>
+
     <!-- Pure pursuit tracker -->
     <node pkg="my_robot_tracker" type="pure_pursuit_node.py" name="pure_pursuit" output="screen">
         <rosparam file="$(find my_robot_tracker)/config/tracking.yaml" command="load"/>

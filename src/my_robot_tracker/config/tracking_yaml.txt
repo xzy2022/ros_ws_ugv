@@ -1,0 +1,5 @@
+lookahead_distance: 0.8
+min_lookahead_distance: 0.8
+lookahead_gain: 0.0
+map_frame: "world"
+base_frame: "base_link"

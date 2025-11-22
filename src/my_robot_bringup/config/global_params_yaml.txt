@@ -1,0 +1,28 @@
+robot:
+  cmd_vel_topic: cmd_vel
+  publish_stop_on_exit: true
+  post_stop_delay: 1.0
+
+logging:
+  enable_topic_logger: true
+  topic_logger_output: logs/aligned_topics.jsonl
+
+limits:
+  max_speed: 2.0
+
+topics:
+  cmd_vel: cmd_vel
+  odom: odom
+  ground_truth: ground_truth/state
+  base_waypoints: base_waypoints
+  final_waypoints: final_waypoints
+  final_path: final_path
+
+visualization:
+  frame_id: world
+
+# 物理参数 (供 Driver 读取)
+vehicle_physics:
+  wheelbase: 1.868  # Derived from rear/front joint offsets in smart.xacro
+  track_width: 1.284 # Twice the lateral tyre offset
+  wheel_radius: 0.3

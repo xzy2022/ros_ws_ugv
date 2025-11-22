@@ -9,7 +9,7 @@
 
     <node pkg="my_robot_planning" type="global_path_loader.py" name="global_loader" output="screen">
         <param name="csv_path" value="$(find my_robot_bringup)/data/waypoints.csv"/>
-        <param name="velocity_kmph" value="30.0"/>
+        <param name="velocity_kmph" value="20"/>
         <param name="max_decel" value="1.0"/>
     </node>
 

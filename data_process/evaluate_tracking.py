@@ -195,10 +195,10 @@ def evaluate_path_tracking(gt_file, wp_file, save_dir=None):
 
 if __name__ == "__main__":
     # 请确保文件名与实际路径一致
-    gt_file = "data_process/纯点跟踪1.txt"
+    gt_file = "data_process/stanley跟踪1.txt"
     wp_file = "data_process/waypoints.csv"
 
     # 新增：图片输出文件夹路径（可以改成你想要的路径）
-    save_dir = "result/纯点跟踪1"
+    save_dir = "result/stanley跟踪1"
 
     evaluate_path_tracking(gt_file, wp_file, save_dir)

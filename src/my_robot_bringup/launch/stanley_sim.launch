@@ -29,6 +29,5 @@
 
     <!-- Stanley tracker -->
     <node pkg="my_robot_tracker" type="stanley_node.py" name="stanley" output="screen">
-        <rosparam file="$(find my_robot_tracker)/config/tracking.yaml" command="load"/>
     </node>
 </launch>

@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <launch>
-    <!-- Reuse base sim environment -->
     <include file="$(find my_robot_bringup)/launch/sim_env.launch">
         <arg name="start_gazebo" value="true" />
         <arg name="start_rviz" value="true" />
@@ -8,26 +7,27 @@
         <arg name="use_sim_time" value="true" />
     </include>
 
-    <!-- Global path loader using copied CSV -->
     <node pkg="my_robot_planning" type="global_path_loader.py" name="global_loader" output="screen">
         <param name="csv_path" value="$(find my_robot_bringup)/data/waypoints.csv"/>
         <param name="velocity_kmph" value="10.0"/>
         <param name="max_decel" value="1.0"/>
     </node>
 
-    <!-- Local path planner to slice waypoints -->
     <node pkg="my_robot_planning" type="local_path_planner.py" name="local_planner" output="screen">
         <param name="lookahead_wps" value="20"/>
         <param name="frequency" value="10.0"/>
     </node>
 
-    <!-- Ground-truth pose logger -->
     <node pkg="my_robot_logger" type="ground_truth_logger.py" name="ground_truth_logger" output="screen">
         <param name="output_dir" value="/home/xzy/self-driving-my/ros_ws/logs" />
         <param name="use_robot_namespace" value="true" />
     </node>
 
-    <!-- Stanley tracker -->
+    <node pkg="my_robot_logger" type="global_path_logger.py" name="global_path_logger" output="screen">
+        <param name="output_dir" value="/home/xzy/self-driving-my/ros_ws/logs" />
+        <param name="use_robot_namespace" value="false" />
+    </node>
+
     <node pkg="my_robot_tracker" type="stanley_node.py" name="stanley" output="screen">
     </node>
 </launch>

@@ -23,8 +23,10 @@ class GroundTruthLogger:
 
         self.odom_topic = self._resolve_topic("ground_truth", "ground_truth/state")
         self.file_handle = open(self.output_path, "a", buffering=1)
+        
+        # [修改 1] 更新表头，增加 linear_v (线速度) 和 angular_v (角速度)
         if self.file_handle.tell() == 0:
-            self.file_handle.write("# stamp x y z yaw\n")
+            self.file_handle.write("# stamp x y z yaw linear_v angular_v\n")
 
         rospy.Subscriber(self.odom_topic, Odometry, self.odom_callback, queue_size=50)
         rospy.loginfo("Ground-truth logger subscribing to '%s', writing to '%s'", self.odom_topic, self.output_path)
@@ -32,12 +34,20 @@ class GroundTruthLogger:
         rospy.on_shutdown(self._on_shutdown)
 
     def odom_callback(self, msg: Odometry):
+        # 1. 提取位姿
         pos = msg.pose.pose.position
         ori = msg.pose.pose.orientation
         yaw = euler_from_quaternion([ori.x, ori.y, ori.z, ori.w])[2]
         stamp = msg.header.stamp if msg.header.stamp else rospy.Time.now()
 
-        line = f"{stamp.to_sec():.6f} {pos.x:.6f} {pos.y:.6f} {pos.z:.6f} {yaw:.6f}\n"
+        # [修改 2] 提取速度信息
+        # linear.x 代表车辆前进的线速度 (m/s)
+        # angular.z 代表车辆转弯的角速度 (rad/s)
+        linear_v = msg.twist.twist.linear.x
+        angular_v = msg.twist.twist.angular.z
+
+        # [修改 3] 将速度数据写入日志行
+        line = f"{stamp.to_sec():.6f} {pos.x:.6f} {pos.y:.6f} {pos.z:.6f} {yaw:.6f} {linear_v:.6f} {angular_v:.6f}\n"
         self.file_handle.write(line)
 
     def _on_shutdown(self):

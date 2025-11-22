@@ -5,18 +5,25 @@ import matplotlib.pyplot as plt
 from scipy.spatial import KDTree
 
 def evaluate_path_tracking(gt_file, wp_file, save_dir=None):
-    # 1. 读取数据
-    print(f"正在读取文件:\n - GT: {gt_file}\n - WP: {wp_file}")
+    # ---------------------------------------------------------
+    # 1. 读取数据 (适配新的 TXT 格式)
+    # ---------------------------------------------------------
+    print(f"正在读取文件:\n - GT (真实轨迹): {gt_file}\n - WP (参考路径): {wp_file}")
+    
     try:
-        # 读取真实路径
-        df_gt = pd.read_csv(gt_file, sep=r'\s+', comment='#', names=['stamp', 'x', 'y', 'z', 'yaw'])
+        # 读取真实路径 (包含线速度 linear_v)
+        # 格式: stamp x y z yaw linear_v angular_v
+        df_gt = pd.read_csv(gt_file, sep=r'\s+', comment='#', 
+                            names=['stamp', 'x', 'y', 'z', 'yaw', 'linear_v', 'angular_v'])
     except Exception as e:
         print(f"读取真实路径文件出错: {e}")
         return
 
     try:
-        # 读取规划路径
-        df_wp = pd.read_csv(wp_file)
+        # 读取规划路径 (包含目标速度 target_linear_v)
+        # 格式: id x y z yaw target_linear_v
+        df_wp = pd.read_csv(wp_file, sep=r'\s+', comment='#', 
+                            names=['id', 'x', 'y', 'z', 'yaw', 'target_linear_v'])
     except Exception as e:
         print(f"读取规划路径文件出错: {e}")
         return
@@ -26,46 +33,64 @@ def evaluate_path_tracking(gt_file, wp_file, save_dir=None):
         os.makedirs(save_dir, exist_ok=True)
         print(f"图片将保存到目录: {save_dir}")
 
-    # 2. 计算误差
+    # ---------------------------------------------------------
+    # 2. 计算误差 (位置、航向、速度)
+    # ---------------------------------------------------------
     wp_xy = df_wp[['x', 'y']].values
     tree = KDTree(wp_xy)
 
     lateral_errors = []
     heading_errors = []
-    matched_wp_indices = []  # 用于存储匹配到的规划点索引
+    velocity_errors = []     # 新增：速度误差
+    matched_ref_vels = []    # 新增：匹配到的参考速度 (用于绘图)
+    matched_wp_indices = []  # 记录索引
 
     for index, row in df_gt.iterrows():
         gt_x = row['x']
         gt_y = row['y']
         gt_yaw = row['yaw']
+        gt_v = row['linear_v'] # 真实线速度
 
-        # 寻找最近点
+        # 寻找最近的规划点
         dist, idx = tree.query([gt_x, gt_y])
 
         lateral_errors.append(dist)
-        matched_wp_indices.append(idx)  # 记录索引
+        matched_wp_indices.append(idx)
 
-        # 计算航向误差（弧度）
+        # A. 计算航向误差
         ref_yaw = df_wp.iloc[idx]['yaw']
         yaw_err = gt_yaw - ref_yaw
-        yaw_err = (yaw_err + np.pi) % (2 * np.pi) - np.pi  # wrap 到 [-pi, pi]
+        yaw_err = (yaw_err + np.pi) % (2 * np.pi) - np.pi  # Normalize to [-pi, pi]
         heading_errors.append(yaw_err)
 
+        # B. 计算速度误差 (新增)
+        # 逻辑：当前时刻应该达到的速度 = 空间上最近的参考点的目标速度
+        ref_v = df_wp.iloc[idx]['target_linear_v']
+        vel_err = gt_v - ref_v # 实际 - 目标
+        
+        velocity_errors.append(vel_err)
+        matched_ref_vels.append(ref_v)
+
+    # 将列表添加回 DataFrame 或转为 numpy 数组
     df_gt['lateral_error'] = lateral_errors
     df_gt['heading_error'] = heading_errors
+    df_gt['velocity_error'] = velocity_errors
+    df_gt['ref_velocity'] = matched_ref_vels
 
-    # 转换列表为 numpy 数组以便后续计算
     lateral_errors = np.array(lateral_errors)
-    heading_errors = np.array(heading_errors)  # 航向误差 (rad)
+    heading_errors = np.array(heading_errors)
+    velocity_errors = np.array(velocity_errors)
     matched_wp_indices = np.array(matched_wp_indices)
 
+    # ---------------------------------------------------------
     # 3. 计算统计指标
-    # 横向误差：最大值 / 均值 / RMSE （单位：m）
+    # ---------------------------------------------------------
+    # 横向误差 (m)
     rmse_lat = np.sqrt(np.mean(np.square(lateral_errors)))
     max_lat = np.max(np.abs(lateral_errors))
     mean_lat = np.mean(np.abs(lateral_errors))
 
-    # 航向误差：最大值 / 均值 / RMSE （先在弧度下算，再转成角度打印）
+    # 航向误差 (deg)
     rmse_head_rad = np.sqrt(np.mean(np.square(heading_errors)))
     max_head_rad = np.max(np.abs(heading_errors))
     mean_head_rad = np.mean(np.abs(heading_errors))
@@ -74,131 +99,131 @@ def evaluate_path_tracking(gt_file, wp_file, save_dir=None):
     max_head_deg = np.degrees(max_head_rad)
     mean_head_deg = np.degrees(mean_head_rad)
 
-    # ---------------------------------------------------------
-    # 寻找并打印最大横向误差对应的两个点
-    # ---------------------------------------------------------
-    max_error_idx = np.argmax(np.abs(lateral_errors))  # 找到最大误差在 df_gt 中的行号
+    # 速度误差 (m/s)
+    rmse_vel = np.sqrt(np.mean(np.square(velocity_errors)))
+    max_vel = np.max(np.abs(velocity_errors))
+    mean_vel = np.mean(np.abs(velocity_errors))
 
-    # 获取对应的真实点数据
+    # ---------------------------------------------------------
+    # 4. 打印最大误差诊断信息
+    # ---------------------------------------------------------
+    max_error_idx = np.argmax(np.abs(lateral_errors))
     bad_gt_point = df_gt.iloc[max_error_idx]
-
-    # 获取对应的规划点数据 (使用之前保存的索引)
     bad_wp_idx = matched_wp_indices[max_error_idx]
     bad_wp_point = df_wp.iloc[bad_wp_idx]
 
-    print("=" * 50)
+    print("=" * 60)
     print("!!! 最大横向误差诊断报告 !!!")
-    print("=" * 50)
-    print(f"最大横向误差值: {max_lat:.6f} m")
-    print(f"发生时间 (Timestamp): {bad_gt_point['stamp']:.6f}")
+    print("=" * 60)
+    print(f"最大横向误差: {max_lat:.6f} m")
+    print(f"发生时间: {bad_gt_point['stamp']:.6f}")
+    print(f"当前速度: {bad_gt_point['linear_v']:.3f} m/s | 目标速度: {bad_gt_point['ref_velocity']:.3f} m/s")
     print("-" * 30)
-    print(f"【真实点位置 (Ground Truth)】:")
-    print(f"  X: {bad_gt_point['x']:.6f}")
-    print(f"  Y: {bad_gt_point['y']:.6f}")
-    print("-" * 30)
-    print(f"【匹配到的规划点位置 (Waypoint)】 (Index: {bad_wp_idx}):")
-    print(f"  X: {bad_wp_point['x']:.6f}")
-    print(f"  Y: {bad_wp_point['y']:.6f}")
-    print("-" * 30)
-    print(f"手动验证距离计算: {np.sqrt((bad_gt_point['x']-bad_wp_point['x'])**2 + (bad_gt_point['y']-bad_wp_point['y'])**2):.6f}")
-    print("=" * 50)
+    print(f"【GT 位置】 X: {bad_gt_point['x']:.4f}, Y: {bad_gt_point['y']:.4f}")
+    print(f"【Ref 位置】 X: {bad_wp_point['x']:.4f}, Y: {bad_wp_point['y']:.4f} (Index: {bad_wp_idx})")
+    print("=" * 60)
 
-    print(f"\n路径跟踪评估统计:")
-    print(f"数据点数量: {len(df_gt)}")
-    print("- 横向误差 (Lateral Error) - 单位: m")
-    print(f"  Max : {max_lat:.6f} m")
-    print(f"  Mean: {mean_lat:.6f} m")
-    print(f"  RMSE: {rmse_lat:.6f} m")
-    print("- 航向误差 (Heading Error) - 单位: degree")
-    print(f"  Max : {max_head_deg:.6f} deg")
-    print(f"  Mean: {mean_head_deg:.6f} deg")
-    print(f"  RMSE: {rmse_head_deg:.6f} deg")
+    print(f"\n--- 综合统计指标 ---")
+    print(f"样本总数: {len(df_gt)}")
+    print(f"1. 横向误差 (Lateral) [m]")
+    print(f"   Max: {max_lat:.4f} | Mean: {mean_lat:.4f} | RMSE: {rmse_lat:.4f}")
+    print(f"2. 航向误差 (Heading) [deg]")
+    print(f"   Max: {max_head_deg:.4f} | Mean: {mean_head_deg:.4f} | RMSE: {rmse_head_deg:.4f}")
+    print(f"3. 速度误差 (Velocity) [m/s]")
+    print(f"   Max: {max_vel:.4f} | Mean: {mean_vel:.4f} | RMSE: {rmse_vel:.4f}")
 
-    # 4. 绘图并分别保存为单独图片
+    # ---------------------------------------------------------
+    # 5. 绘图
+    # ---------------------------------------------------------
+    # 统一转换为 numpy 数组，避免 Pandas 索引报错
     wp_x = df_wp['x'].to_numpy()
     wp_y = df_wp['y'].to_numpy()
     gt_x = df_gt['x'].to_numpy()
     gt_y = df_gt['y'].to_numpy()
     gt_stamp = df_gt['stamp'].to_numpy()
-    gt_lat_err = df_gt['lateral_error'].to_numpy()
-    gt_head_err_deg = np.degrees(df_gt['heading_error'].to_numpy())
-
-    # 图1: 路径对比
-    plt.figure(figsize=(7, 6))
+    
+    # --- 图1: 轨迹对比 ---
+    plt.figure(figsize=(8, 7))
     plt.plot(wp_x, wp_y, 'r--', label='Reference Path', linewidth=2)
     plt.plot(gt_x, gt_y, 'b-', label='Actual Path', linewidth=1)
-    # 高亮最大误差的点
-    plt.scatter(bad_gt_point['x'], bad_gt_point['y'], c='red', s=150, marker='*',
-                label='Max Error Point (GT)', zorder=10)
-    plt.scatter(bad_wp_point['x'], bad_wp_point['y'], c='orange', s=100, marker='x',
-                label='Max Error Ref (WP)', zorder=10)
-    # 画一条线连接这两个点
-    plt.plot([bad_gt_point['x'], bad_wp_point['x']],
-             [bad_gt_point['y'], bad_wp_point['y']], 'k-', linewidth=1)
-
-    plt.title("Trajectory Comparison (X-Y)")
+    # 高亮最大误差
+    plt.scatter(bad_gt_point['x'], bad_gt_point['y'], c='red', s=150, marker='*', label='Max Error (GT)', zorder=10)
+    plt.scatter(bad_wp_point['x'], bad_wp_point['y'], c='orange', s=100, marker='x', label='Max Error (Ref)', zorder=10)
+    plt.plot([bad_gt_point['x'], bad_wp_point['x']], [bad_gt_point['y'], bad_wp_point['y']], 'k-', linewidth=1)
+    
+    plt.title("Trajectory Comparison")
     plt.xlabel("X [m]")
     plt.ylabel("Y [m]")
     plt.legend()
     plt.axis('equal')
     plt.grid(True)
-
-    if save_dir is not None:
-        fig_path = os.path.join(save_dir, "trajectory_comparison.png")
-        plt.savefig(fig_path, dpi=200)
-        print(f"已保存: {fig_path}")
+    if save_dir: plt.savefig(os.path.join(save_dir, "1_trajectory.png"), dpi=150)
     plt.close()
 
-    # 图2: 横向误差随时间
-    plt.figure(figsize=(7, 4))
-    plt.plot(gt_stamp, gt_lat_err, 'g-')
-    plt.scatter(bad_gt_point['stamp'], max_lat, c='red', marker='*', s=100, zorder=10)
-    plt.title(f"Lateral Error (Max: {max_lat:.4f} m)")
+    # --- 图2: 横向误差 ---
+    plt.figure(figsize=(8, 4))
+    plt.plot(gt_stamp, np.abs(lateral_errors), 'g-', label='Lateral Error')
+    plt.axhline(y=rmse_lat, color='r', linestyle=':', label=f'RMSE: {rmse_lat:.3f}m')
+    plt.title(f"Lateral Error over Time (Max: {max_lat:.3f}m)")
     plt.xlabel("Timestamp [s]")
     plt.ylabel("Error [m]")
+    plt.legend()
     plt.grid(True)
-
-    if save_dir is not None:
-        fig_path = os.path.join(save_dir, "lateral_error_time.png")
-        plt.savefig(fig_path, dpi=200)
-        print(f"已保存: {fig_path}")
+    if save_dir: plt.savefig(os.path.join(save_dir, "2_lateral_error.png"), dpi=150)
     plt.close()
 
-    # 图3: 航向误差随时间
-    plt.figure(figsize=(7, 4))
+    # --- 图3: 航向误差 ---
+    plt.figure(figsize=(8, 4))
+    gt_head_err_deg = np.degrees(heading_errors)
     plt.plot(gt_stamp, gt_head_err_deg, 'm-')
-    plt.title("Heading Error vs Time")
+    plt.title("Heading Error over Time [deg]")
     plt.xlabel("Timestamp [s]")
     plt.ylabel("Error [deg]")
     plt.grid(True)
-
-    if save_dir is not None:
-        fig_path = os.path.join(save_dir, "heading_error_time.png")
-        plt.savefig(fig_path, dpi=200)
-        print(f"已保存: {fig_path}")
+    if save_dir: plt.savefig(os.path.join(save_dir, "3_heading_error.png"), dpi=150)
     plt.close()
 
-    # 图4: 横向误差直方图
-    plt.figure(figsize=(7, 4))
-    plt.hist(df_gt['lateral_error'], bins=20, color='gray', alpha=0.7)
+    # --- 图4: 速度追踪情况 ---
+    plt.figure(figsize=(8, 6))
+    plt.subplot(2, 1, 1)
+    # 显式使用 .to_numpy() 修复 matplotlib/pandas 兼容性问题
+    plt.plot(gt_stamp, df_gt['ref_velocity'].to_numpy(), 'r--', label='Target Vel', linewidth=2)
+    plt.plot(gt_stamp, df_gt['linear_v'].to_numpy(), 'b-', label='Actual Vel', linewidth=1.5, alpha=0.8)
+    plt.title("Velocity Tracking Performance")
+    plt.ylabel("Velocity [m/s]")
+    plt.legend()
+    plt.grid(True)
+    
+    plt.subplot(2, 1, 2)
+    plt.plot(gt_stamp, velocity_errors, 'k-', label='Vel Error (Actual - Target)')
+    plt.axhline(0, color='gray', linestyle='--')
+    plt.ylabel("Error [m/s]")
+    plt.xlabel("Timestamp [s]")
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    if save_dir: plt.savefig(os.path.join(save_dir, "4_velocity_tracking.png"), dpi=150)
+    plt.close()
+
+    # --- 图5 (恢复): 横向误差直方图 ---
+    plt.figure(figsize=(8, 4))
+    # 使用 numpy 数组直接绘图
+    plt.hist(lateral_errors, bins=20, color='gray', alpha=0.7)
     plt.title("Lateral Error Distribution")
     plt.xlabel("Error [m]")
     plt.ylabel("Count")
     plt.grid(True)
-
-    if save_dir is not None:
-        fig_path = os.path.join(save_dir, "lateral_error_hist.png")
-        plt.savefig(fig_path, dpi=200)
-        print(f"已保存: {fig_path}")
+    if save_dir: plt.savefig(os.path.join(save_dir, "5_lateral_error_hist.png"), dpi=150)
     plt.close()
 
+    print(f"所有 5 张图片已保存至: {save_dir}")
 
 if __name__ == "__main__":
-    # 请确保文件名与实际路径一致
-    gt_file = "data_process/s-k=2.txt"
-    wp_file = "data_process/waypoints.csv"
-
-    # 新增：图片输出文件夹路径（可以改成你想要的路径）
-    save_dir = "result/s-k=2"
+    # 示例文件路径 (请修改为你实际的 txt 路径)
+    # 注意: wp_file 现在指向 global_path_xxx.txt
+    gt_file = "data_process/v_20/s-k=2.txt" 
+    wp_file = "data_process/global_path_v_20.txt"
+    
+    save_dir = "result/v_20/s-k=2"
 
     evaluate_path_tracking(gt_file, wp_file, save_dir)

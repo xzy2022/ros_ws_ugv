@@ -17,8 +17,8 @@ class StanleyNode:
         
         # --- 参数设置 ---
         self.robot_ns = self._detect_robot_ns()
-        self.wheelbase = self._get_param_with_fallback("wheelbase", 0.335)
-        self.k_gain = self._get_param_with_fallback("stanley_k", 0.5)
+        self.wheelbase = self._get_param_with_fallback("wheelbase", 1.868)
+        self.k_gain = self._get_param_with_fallback("stanley_k", 2.0)
         self.k_soft = self._get_param_with_fallback("stanley_k_soft", 1.0)
 
         # --- 话题名称 ---
@@ -132,6 +132,7 @@ class StanleyNode:
 
         # 角速度转换: omega = v / L * tan(delta)
         # 注意：这里用的是“当前指令线速度”来计算所需的角速度
+        # print(f"self.wheelbase: {self.wheelbase}")
         if abs(self.wheelbase) > 1e-3:
             cmd.angular.z = (cmd.linear.x / self.wheelbase) * math.tan(steering_angle)
         else:

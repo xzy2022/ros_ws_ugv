@@ -7,6 +7,14 @@ from nav_msgs.msg import Path
 from my_robot_msgs.msg import Lane, Waypoint
 from my_robot_planning.navigation import GlobalPathManager
 
+# /base_path (类型: nav_msgs/Path)
+# 只包含一系列的位姿 (Pose)，即位置 $(x, y, z)$ 和姿态 (四元数 orientation)。
+# 特点：它通常用于在 RViz 中画出一条绿色的线，让人直观地看到路径长什么样。它不包含速度信息。
+
+
+# /base_waypoints (类型: my_robot_msgs/Lane)
+# 主要用途：控制与规划。
+# 特点：它不仅包含了位置和姿态（Pose），还包含了每一个点的目标速度 (Twist)。这是给自动驾驶控制器（如 Pure Pursuit 或 MPC）使用的核心数据。
 
 class GlobalPathLoaderNode:
     def __init__(self):

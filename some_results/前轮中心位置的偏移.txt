@@ -1,0 +1,11 @@
+```
+<xacro:property name="front_tyre_x" value="0.923"/>
+
+<joint name="front_right_steering_joint" type="revolute">
+    <parent link="base_link"/>
+    <origin xyz="${front_tyre_x} ${-front_tyre_y} ${front_tyre_r}" rpy="0 0 0"/>
+</joint>
+
+```
+
+结论：前轮轴线中心距离 base_link 原点在 X轴方向（车头方向） 的距离是 0.923 米。我们设这个距离为 $L = 0.923$。

@@ -187,9 +187,6 @@ class PurePursuit(LateralController):
         return path_points[-1] if path_points else None
 
 
-import math
-import numpy as np
-from typing import Sequence, Tuple
 
 class Stanley(LateralController):
     """

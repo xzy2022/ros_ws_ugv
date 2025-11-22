@@ -24,9 +24,10 @@ class GroundTruthLogger:
         self.odom_topic = self._resolve_topic("ground_truth", "ground_truth/state")
         self.file_handle = open(self.output_path, "a", buffering=1)
         
-        # [修改 1] 更新表头，增加 linear_v (线速度) 和 angular_v (角速度)
+        # [修改 1] 更新表头
+        # 改为记录 vx, vy, vz 三个分量，以便后续计算合速度或分析侧滑
         if self.file_handle.tell() == 0:
-            self.file_handle.write("# stamp x y z yaw linear_v angular_v\n")
+            self.file_handle.write("# stamp x y z yaw vx vy vz angular_v\n")
 
         rospy.Subscriber(self.odom_topic, Odometry, self.odom_callback, queue_size=50)
         rospy.loginfo("Ground-truth logger subscribing to '%s', writing to '%s'", self.odom_topic, self.output_path)
@@ -40,14 +41,20 @@ class GroundTruthLogger:
         yaw = euler_from_quaternion([ori.x, ori.y, ori.z, ori.w])[2]
         stamp = msg.header.stamp if msg.header.stamp else rospy.Time.now()
 
-        # [修改 2] 提取速度信息
-        # linear.x 代表车辆前进的线速度 (m/s)
-        # angular.z 代表车辆转弯的角速度 (rad/s)
-        linear_v = msg.twist.twist.linear.x
+        # [修改 2] 提取全维速度信息
+        # twist.linear 通常是在 child_frame_id (base_link) 下的速度
+        # vx: 纵向速度 (车头方向)
+        # vy: 侧向速度 (侧滑方向，剧烈转向时该值会变大)
+        # vz: 垂直速度 (跳跃或路面颠簸)
+        vx = msg.twist.twist.linear.x
+        vy = msg.twist.twist.linear.y
+        vz = msg.twist.twist.linear.z
+        
+        # angular.z: 横摆角速度
         angular_v = msg.twist.twist.angular.z
 
-        # [修改 3] 将速度数据写入日志行
-        line = f"{stamp.to_sec():.6f} {pos.x:.6f} {pos.y:.6f} {pos.z:.6f} {yaw:.6f} {linear_v:.6f} {angular_v:.6f}\n"
+        # [修改 3] 写入所有分量
+        line = f"{stamp.to_sec():.6f} {pos.x:.6f} {pos.y:.6f} {pos.z:.6f} {yaw:.6f} {vx:.6f} {vy:.6f} {vz:.6f} {angular_v:.6f}\n"
         self.file_handle.write(line)
 
     def _on_shutdown(self):

@@ -18,7 +18,7 @@ class StanleyNode:
         # --- 参数设置 ---
         self.robot_ns = self._detect_robot_ns()
         self.wheelbase = self._get_param_with_fallback("wheelbase", 1.868)
-        self.k_gain = self._get_param_with_fallback("stanley_k", 0.1)
+        self.k_gain = self._get_param_with_fallback("stanley_k", 0.5)
         self.k_soft = self._get_param_with_fallback("stanley_k_soft", 1.0)
 
         # --- 话题名称 ---

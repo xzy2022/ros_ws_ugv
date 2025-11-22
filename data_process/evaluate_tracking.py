@@ -274,9 +274,9 @@ def evaluate_path_tracking(gt_file, wp_file, save_dir=None):
 
 if __name__ == "__main__":
     # 示例文件路径
-    gt_file = "data_process/v_10/pure_v.txt" 
-    wp_file = "data_process/global_path_v_10.txt"
+    gt_file = "data_process/v_20/pure_v.txt" 
+    wp_file = "data_process/global_path_v_20.txt"
     
-    save_dir = "result/v_10/pure_v"
+    save_dir = "result/v_20/pure_v"
 
     evaluate_path_tracking(gt_file, wp_file, save_dir)

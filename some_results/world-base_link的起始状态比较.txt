@@ -1,0 +1,18 @@
+The current list of frames is:
+Frame main_mass exists with parent base_link.
+
+Failure at 199.290000000
+Exception thrown:"world" passed to lookupTransform argument target_frame does not exist. 
+The current list of frames is:
+Frame main_mass exists with parent base_link.
+
+At time 200.272
+- Translation: [0.018, 0.000, -0.002]
+- Rotation: in Quaternion [-0.000, 0.000, -0.000, 1.000]
+            in RPY (radian) [-0.000, 0.000, -0.000]
+            in RPY (degree) [-0.000, 0.004, -0.000]
+At time 201.272
+- Translation: [0.018, 0.000, -0.002]
+- Rotation: in Quaternion [-0.000, 0.000, -0.000, 1.000]
+            in RPY (radian) [-0.000, 0.000, -0.000]
+            in RPY (degree) [-0.000, 0.004, -0.000]

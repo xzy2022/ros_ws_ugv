@@ -187,38 +187,110 @@ class PurePursuit(LateralController):
         return path_points[-1] if path_points else None
 
 
+import math
+import numpy as np
+from typing import Sequence, Tuple
+
 class Stanley(LateralController):
     """
-    Stanley 控制器实现类
-    基于前轮反馈控制的路径跟踪算法，考虑了横向误差和航向误差。
+    Stanley 路径跟踪控制器
+    
+    修正点：
+    适配输入状态为 base_link (基座) 而非后轴中心的情况。
     """
-    def __init__(self, k_gain: float, k_soft: float):
-        self.k = k_gain      # 横向误差增益 (Gain)
-        self.k_soft = k_soft # 软化参数，防止低速时分母过小导致转向剧烈抖动
+    def __init__(self, k_gain: float, k_soft: float = 0.0, base_to_front_dist: float = 0.923):
+        """
+        :param k_gain: 横向误差增益 k
+        :param k_soft: 速度软化参数
+        :param base_to_front_dist: 【关键参数】从输入的车辆坐标系原点(base_link)到前轮中心的纵向距离。
+                                   根据你的 URDF，此处应设为 0.923。
+        """
+        self.k = k_gain
+        self.k_soft = k_soft
+        # 这里 L 不再单纯指轴距，而是指“感知中心到控制中心”的距离
+        # base_link --> 前轴中心的距离
+        self.L_offset = base_to_front_dist 
 
     def compute(self, state: VehicleState, path: Sequence[PathPoint]) -> float:
         """
-        计算 Stanley 转向角。
-        注意：此处的 path 预期已经转换到了车辆坐标系下 (Vehicle Frame)。
+        计算 Stanley 转向角
+        
+        :param state: 车辆状态 (来自 base_link 的位姿: x, y, yaw, velocity)
+        :param path: 规划路径点列表 (全局坐标系)
+        :return: 前轮转向角 delta (rad)
         """
-        # 找到最近的路径点（即前轴中心在路径上的投影点）
-        nearest = _find_nearest_point(path)
-        if nearest is None:
+        if not path:
             return 0.0
 
-        # 1. 横向误差 (Cross-track Error)
-        # 在车辆坐标系下，最近点的 y 坐标即为横向误差
-        cross_track_error = nearest.y
-        
-        # 2. 航向误差 (Heading Error)
-        # 路径点的航向减去车辆当前的航向
-        heading_error = _normalize_angle(nearest.yaw - state.yaw)
-        
-        # 获取当前速度，确保不为负
-        vel = max(state.velocity, 0.0)
+        # ---------------------------------------------------------
+        # 1. [修正逻辑] 推算前轴中心位置 (Front Axle Position)
+        # ---------------------------------------------------------
+        # 既然 state 是 base_link 的位姿，
+        # 前轴位置 = base_link位置 + (base_link到前轴的距离) * 方向向量
+        fx = state.x + self.L_offset * math.cos(state.yaw)
+        fy = state.y + self.L_offset * math.sin(state.yaw)
 
-        # 3. 组合控制律
-        # delta = 航向误差 + arctan( k * 横向误差 / (速度 + 软化系数) )
-        delta = heading_error + math.atan2(self.k * cross_track_error, vel + self.k_soft)
+        # ---------------------------------------------------------
+        # 2. 寻找离“前轴”最近的路径点
+        # ---------------------------------------------------------
+        nearest_idx, nearest_point = self._find_nearest_point_to_front_axle(fx, fy, path)
         
+        # ---------------------------------------------------------
+        # 3. 计算横向误差 (Cross-track Error)
+        # ---------------------------------------------------------
+        # 使用欧几里得距离计算绝对误差
+        dx = fx - nearest_point.x
+        dy = fy - nearest_point.y
+        absolute_error = math.hypot(dx, dy)
+
+        # 判定误差符号 (使用几何投影法)
+        # 将误差向量投影到路径点的局部坐标系y轴上
+        path_yaw = nearest_point.yaw
+        local_y = dy * math.cos(path_yaw) - dx * math.sin(path_yaw)
+        
+        # 确定带符号的横向误差
+        current_cross_track_error = absolute_error * (1.0 if local_y > 0 else -1.0)
+
+        # ---------------------------------------------------------
+        # 4. 计算航向误差 (Heading Error)
+        # ---------------------------------------------------------
+        heading_error = _normalize_angle(path_yaw - state.yaw)
+
+        # ---------------------------------------------------------
+        # 5. 计算最终控制律
+        # ---------------------------------------------------------
+        vel = max(state.velocity, 0.01) 
+        
+        # 非线性反馈项
+        cross_track_steering = math.atan2(self.k * current_cross_track_error, vel + self.k_soft)
+        
+        delta = heading_error + cross_track_steering
         return _normalize_angle(delta)
+
+    def _find_nearest_point_to_front_axle(self, fx: float, fy: float, path: Sequence[PathPoint]) -> Tuple[int, PathPoint]:
+        """寻找离前轴坐标 (fx, fy) 最近的路径点"""
+        min_dist_sq = float('inf')
+        nearest_idx = -1
+        
+        for i, p in enumerate(path):
+            d_sq = (fx - p.x)**2 + (fy - p.y)**2
+            if d_sq < min_dist_sq:
+                min_dist_sq = d_sq
+                nearest_idx = i
+        
+        return nearest_idx, path[nearest_idx]
+
+def _normalize_angle(angle: float) -> float:
+    while angle > math.pi:
+        angle -= 2.0 * math.pi
+    while angle < -math.pi:
+        angle += 2.0 * math.pi
+    return angle
+
+def _normalize_angle(angle: float) -> float:
+    """将角度归一化到 [-pi, pi]"""
+    while angle > math.pi:
+        angle -= 2.0 * math.pi
+    while angle < -math.pi:
+        angle += 2.0 * math.pi
+    return angle

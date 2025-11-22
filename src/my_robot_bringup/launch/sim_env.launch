@@ -3,7 +3,7 @@
     <!-- High level toggles -->
     <arg name="robot_name" default="smart" />
     <arg name="start_gazebo" default="true" />
-    <arg name="start_rviz" default="false" />
+    <arg name="start_rviz" default="true" />
     <arg name="paused" default="false" />
     <arg name="use_sim_time" default="true" />
     <arg name="world_file" default="$(find gazebo_ros)/worlds/empty.world" />

@@ -247,6 +247,9 @@ class Stanley(LateralController):
         # 将误差向量投影到路径点的局部坐标系y轴上
         path_yaw = nearest_point.yaw
         local_y = dy * math.cos(path_yaw) - dx * math.sin(path_yaw)
+
+        # 算法中约定路在车左为正，路在车右为负，与上式结果相反
+        local_y = - local_y  
         
         # 确定带符号的横向误差
         current_cross_track_error = absolute_error * (1.0 if local_y > 0 else -1.0)

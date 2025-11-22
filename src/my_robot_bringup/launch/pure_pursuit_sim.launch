@@ -27,6 +27,12 @@
         <param name="use_robot_namespace" value="true" />
     </node>
 
+
+    <node pkg="my_robot_logger" type="global_path_logger.py" name="global_path_logger" output="screen">
+        <param name="output_dir" value="/home/xzy/self-driving-my/ros_ws/logs" />
+        <param name="use_robot_namespace" value="false" />
+    </node>
+
     <!-- Pure pursuit tracker -->
     <node pkg="my_robot_tracker" type="pure_pursuit_node.py" name="pure_pursuit" output="screen">
         <rosparam file="$(find my_robot_tracker)/config/tracking.yaml" command="load"/>

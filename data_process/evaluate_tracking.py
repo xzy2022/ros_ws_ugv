@@ -220,9 +220,13 @@ def evaluate_path_tracking(gt_file, wp_file, save_dir=None):
 if __name__ == "__main__":
     # 示例文件路径 (请修改为你实际的 txt 路径)
     # 注意: wp_file 现在指向 global_path_xxx.txt
-    gt_file = "data_process/v_20/s-k=01.txt" 
-    wp_file = "data_process/global_path_v_20.txt"
+    # gt_file = "data_process/v_20/s-k=01.txt" 
+    # wp_file = "data_process/global_path_v_20.txt"
     
-    save_dir = "result/v_20/s-k=01"
+    # save_dir = "result/v_20/s-k=01"
+    gt_file = "data_process/v_10/pure.txt" 
+    wp_file = "data_process/global_path_v_10.txt"
+    
+    save_dir = "result/v_10/pure"
 
     evaluate_path_tracking(gt_file, wp_file, save_dir)

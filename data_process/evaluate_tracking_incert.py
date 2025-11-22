@@ -289,7 +289,7 @@ def evaluate_path_tracking(gt_file, wp_file, save_dir=None):
     print(f"所有图片已保存至: {save_dir}")
 
 if __name__ == "__main__":
-    gt_file = "data_process/v_30/s-k05.txt" 
-    wp_file = "data_process/global_path_v_30.txt"
-    save_dir = "result/v_30/s-k05"
+    gt_file = "data_process/v_20/pure_v.txt" 
+    wp_file = "data_process/global_path_v_20.txt"
+    save_dir = "result/v_20/pure_v"
     evaluate_path_tracking(gt_file, wp_file, save_dir)
